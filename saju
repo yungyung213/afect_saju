@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대기실 · A.FECT SAJU</title>
+<style>
+  :root{
+    --paper:#F6F2EA; --card:#FFFDF8; --ink:#221F1A; --ink-soft:#6B655B; --ink-faint:#A39C8E;
+    --line:rgba(34,31,26,0.10); --accent:#3E3856; --accent-soft:#ECE9F3;
+    --wood:#2FA84F; --wood-bg:#DFF3E3; --fire:#FF4136; --fire-bg:#FFE1DE;
+    --earth:#E0A526; --earth-bg:#FBEECB; --metal:#7B61FF; --metal-bg:#E9E3FF;
+    --water:#0074D9; --water-bg:#DCEBFA; --radius-lg:22px;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:520px; margin:0 auto; padding:36px 20px 80px; text-align:center; }
+  @media (min-width: 860px){ .wrap{ max-width:880px; } }
+
+  .brand{ text-align:center; margin-bottom:24px; }
+  .brand .mark{ font-size:14px; font-weight:700; letter-spacing:0.14em; color:var(--ink-faint); }
+
+  .pagehead h1{ font-size:30px; font-weight:800; margin:0 0 6px; letter-spacing:-0.01em; }
+  .pagehead .subcopy{ font-size:14.5px; color:var(--ink-soft); margin:0 0 26px; }
+
+  .typetabs{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; margin-bottom:10px; justify-content:center; scrollbar-width:none; }
+  .typetabs::-webkit-scrollbar{ display:none; }
+  .typetab{ flex:0 0 auto; padding:10px 18px; border-radius:999px; font-size:14px; font-weight:700;
+    background:#fff; border:1px solid var(--line); color:var(--ink-soft); cursor:pointer; white-space:nowrap; }
+  .typetab.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .typetab.active[data-elem="목"]{ background:var(--wood); border-color:var(--wood); }
+  .typetab.active[data-elem="화"]{ background:var(--fire); border-color:var(--fire); }
+  .typetab.active[data-elem="토"]{ background:var(--earth); border-color:var(--earth); }
+  .typetab.active[data-elem="금"]{ background:var(--metal); border-color:var(--metal); }
+  .typetab.active[data-elem="수"]{ background:var(--water); border-color:var(--water); }
+
+  .subtypetabs{ display:none; gap:8px; margin-bottom:10px; justify-content:center; }
+  .subtypetabs.show{ display:flex; }
+  .subtypetab{ flex:0 0 auto; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700;
+    background:var(--card); border:1px solid var(--line); color:var(--ink-soft); cursor:pointer; }
+  .subtypetab.active{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+  .typecaption{ font-size:13.5px; color:var(--ink-soft); margin:0 0 18px; min-height:19px; }
+
+  .lobbyStage{ position:relative; width:100%; height:460px; margin-bottom:16px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden; }
+  @media (min-width:860px){ .lobbyStage{ height:520px; } }
+  .lobby-empty-msg{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    text-align:center; color:var(--ink-faint); font-size:13.5px; line-height:1.7; }
+  .lobby-avatar{ position:absolute; width:104px; margin-left:-52px; margin-top:-52px;
+    display:flex; flex-direction:column; align-items:center; cursor:pointer; user-select:none;
+    transition:left 420ms cubic-bezier(0.22,1,0.36,1), top 420ms cubic-bezier(0.22,1,0.36,1), opacity 300ms ease, transform 200ms ease; }
+  .lobby-avatar .av-circle{ width:82px; height:82px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:40px; position:relative; box-shadow:0 2px 8px rgba(34,31,26,0.08); }
+  .lobby-avatar .av-name{ font-size:15.5px; font-weight:700; margin-top:7px; text-align:center; }
+  .lobby-avatar .av-type{ font-size:12.5px; color:var(--ink-faint); text-align:center; }
+  .lobby-avatar.selected .av-circle{ box-shadow:0 0 0 3px var(--accent), 0 2px 8px rgba(34,31,26,0.12); transform:scale(1.08); }
+  .lobby-avatar .av-check{ position:absolute; top:-2px; right:-2px; width:22px; height:22px; border-radius:50%;
+    background:var(--accent); color:#fff; font-size:12px; display:none; align-items:center; justify-content:center; border:2px solid var(--card); }
+  .lobby-avatar.selected .av-check{ display:flex; }
+  .lobby-avatar.dimmed{ opacity:0.25; }
+
+  .joinRow{ display:flex; justify-content:center; margin-bottom:20px; }
+  .joinBtnPill{ padding:12px 22px; border-radius:999px; background:#fff; border:1.5px dashed var(--ink-faint);
+    color:var(--ink-soft); font-size:13.5px; font-weight:700; font-family:inherit; cursor:pointer; }
+
+  .selectRow{ display:flex; justify-content:center; gap:8px; margin-bottom:22px; flex-wrap:wrap; }
+  .selectBtn{ padding:9px 16px; border-radius:999px; background:#fff; border:1px solid var(--line);
+    color:var(--ink-soft); font-size:12.5px; font-weight:700; font-family:inherit; cursor:pointer; }
+  .selectBtn.primary{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+
+  .playbar{ margin-bottom:8px; }
+  .selectioninfo{ font-size:14px; font-weight:700; color:var(--ink-soft); margin-bottom:14px; min-height:18px; }
+  .playtabs{ display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; justify-content:center; flex-wrap:wrap; }
+  .playtabs::-webkit-scrollbar{ display:none; }
+  .playtab{ flex:0 0 auto; padding:12px 18px; border-radius:16px; font-size:13.5px; font-weight:700;
+    background:#fff; border:1px solid var(--line); color:var(--ink); cursor:pointer; white-space:nowrap; }
+  .playtab.active{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .playtab.disabled{ opacity:0.45; }
+  .playtoast{ font-size:12.5px; color:var(--ink-faint); margin-top:10px; display:none; }
+
+  #playResult{ display:none; margin-top:40px; text-align:center; }
+  .resulthead h2{ font-size:22px; font-weight:800; margin:0 0 8px; line-height:1.4; }
+  .resulthead .lede{ font-size:13.5px; color:var(--ink-faint); margin:0 0 30px; }
+
+  .capchiprow{ display:flex; justify-content:center; gap:8px; margin-bottom:20px; }
+  .capchip{ padding:10px 18px; border-radius:12px; font-size:13px; font-weight:700; background:#fff;
+    border:1px solid var(--line); color:var(--ink-soft); cursor:pointer; }
+  .capchip.active{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+
+  .seatsubtabs{ display:flex; gap:8px; margin-bottom:26px; justify-content:center; }
+  .seatsubtab{ padding:13px 20px; border-radius:14px; font-size:13.5px; font-weight:700;
+    background:#fff; border:1px solid var(--line); color:var(--ink-soft); cursor:pointer; }
+  .seatsubtab.active{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+
+  .tables-grid{ display:grid; grid-template-columns:1fr; gap:48px 32px; justify-items:center; }
+  @media (min-width:860px){ .tables-grid{ grid-template-columns:1fr 1fr; gap:56px 40px; } }
+  .table-card{ padding:28px 24px; background:var(--card); border:1px solid var(--line); border-radius:20px; }
+  .tablabel{ text-align:center; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:16px; }
+
+  .tablewrap{ position:relative; margin:0 auto; }
+  .table-rect{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:16px; background:var(--paper); }
+  .seat-node{ position:absolute; display:flex; flex-direction:column; align-items:center; z-index:3; }
+  .seat-node .circle{ border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(34,31,26,0.08); }
+  .seat-node .label{ font-weight:700; margin-top:6px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .seat-node .typecap{ color:var(--ink-faint); text-align:center; }
+
+  .connector-hit{ pointer-events:stroke; cursor:pointer; }
+  .connector-dot{ cursor:pointer; animation:dotpulse 2.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  .connector-group:hover .connector-visible{ stroke:var(--accent) !important; stroke-width:3 !important; }
+  .connector-group:hover .connector-dot{ fill:var(--accent) !important; animation:none; }
+  @keyframes dotpulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
+
+  .teambalance-below{ max-width:240px; margin:24px auto 0; text-align:center; }
+  .teambalance-below .tblabel{ font-size:10.5px; font-weight:700; color:var(--ink-faint); letter-spacing:0.04em; margin-bottom:8px; }
+  .teambalance-below .tbar{ display:flex; height:8px; border-radius:999px; overflow:hidden; margin-bottom:7px; }
+  .teambalance-below .tbar span{ height:100%; }
+  .teambalance-below .tnote{ font-size:10.5px; color:var(--ink-faint); line-height:1.5; }
+
+  .pair-tooltip{ position:absolute; z-index:6; width:280px; background:var(--card); color:var(--ink);
+    border:1px solid var(--line); border-radius:16px; padding:22px 24px; display:none; text-align:left;
+    box-shadow:0 14px 32px rgba(34,31,26,0.16); pointer-events:none; }
+  @media (min-width:860px){ .pair-tooltip{ width:380px; padding:24px; } }
+  .pair-tooltip .tt-names{ font-size:12.5px; font-weight:700; color:var(--ink-faint); margin-bottom:10px; }
+  .pair-tooltip .tt-headline{ font-size:16.5px; font-weight:700; line-height:1.5; margin-bottom:14px; }
+  .pair-tooltip .tt-summary{ font-size:14.5px; color:var(--ink-soft); line-height:1.7; margin-bottom:14px; }
+  .pair-tooltip .tt-evidence{ font-size:13.5px; color:var(--ink-faint); line-height:1.7; border-top:1px solid var(--line); padding-top:12px; }
+
+  /* ---- chemi / lunch / recharge / group result cards ---- */
+  .chemihead{ display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:18px; flex-wrap:wrap; }
+  .chemihead .chip{ display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; }
+  .chemihead .em{ font-size:30px; }
+  .scoreBig{ font-size:52px; font-weight:800; color:var(--accent); line-height:1; margin-bottom:4px; }
+  .scoreLabel{ font-size:12.5px; color:var(--ink-faint); font-weight:700; letter-spacing:0.04em; margin-bottom:26px; }
+  .resultcard{ max-width:440px; margin:0 auto 28px; background:var(--card); border:1px solid var(--line);
+    border-radius:20px; padding:28px 26px; text-align:left; }
+  .resultcard .rheadline{ font-size:17px; font-weight:700; line-height:1.55; margin-bottom:12px; }
+  .resultcard .rbody{ font-size:14.5px; color:var(--ink-soft); line-height:1.7; margin-bottom:14px; }
+  .rtoggle{ font-size:12.5px; color:var(--accent); font-weight:700; cursor:pointer; display:inline-block; }
+  .rdetail{ display:none; font-size:13px; color:var(--ink-faint); line-height:1.7; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+
+  .subscoregrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; max-width:440px; margin:0 auto 28px; }
+  @media (min-width:640px){ .subscoregrid{ grid-template-columns:repeat(3,1fr); } }
+  .subscorecard{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px 12px; text-align:center; }
+  .subscorecard .em{ font-size:24px; margin-bottom:6px; }
+  .subscorecard .val{ font-size:22px; font-weight:800; color:var(--ink); }
+  .subscorecard .cap{ font-size:11.5px; color:var(--ink-faint); font-weight:700; margin-bottom:4px; }
+  .subscorecard .line{ font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin-top:6px; }
+
+  .roleGrid{ display:flex; flex-direction:column; gap:10px; max-width:440px; margin:0 auto 26px; }
+  .roleRow{ display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 16px; text-align:left; }
+  .roleRow .em{ font-size:26px; }
+  .roleRow .nm{ font-weight:700; font-size:14px; }
+  .roleRow .rl{ font-size:12.5px; color:var(--ink-soft); }
+
+  .luckycard{ max-width:400px; margin:0 auto 26px; background:var(--card); border:1px solid var(--line);
+    border-radius:20px; padding:26px; text-align:center; }
+  .luckycard .needchips{ display:flex; justify-content:center; gap:8px; margin-bottom:16px; }
+  .luckychip{ font-size:12.5px; font-weight:700; padding:6px 12px; border-radius:999px; }
+  .luckycard .itemname{ font-size:19px; font-weight:800; margin-bottom:10px; }
+  .luckycard .itemcopy{ font-size:14px; color:var(--ink-soft); line-height:1.7; }
+
+  .nextactions{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:8px; }
+  .nextbtn{ padding:11px 18px; border-radius:999px; background:#fff; border:1px solid var(--line);
+    color:var(--ink); font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; }
+
+  .lunchlist{ display:flex; flex-direction:column; gap:10px; max-width:440px; margin:0 auto 24px; }
+  .lunchrow{ display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 16px; text-align:left; }
+  .lunchrow .em{ font-size:24px; }
+  .lunchrow .nm{ font-weight:700; font-size:13.5px; }
+  .lunchrow .tag{ font-size:12px; color:var(--ink-soft); }
+
+  /* ---- entry overlay ---- */
+  .overlay{ position:fixed; inset:0; background:rgba(34,31,26,0.45); z-index:20; display:flex; align-items:flex-end; justify-content:center; }
+  @media (min-width:640px){ .overlay{ align-items:center; } }
+  .entrycard{ width:100%; max-width:440px; max-height:88vh; overflow-y:auto; background:var(--card);
+    border-radius:24px 24px 0 0; padding:28px 24px 32px; text-align:left; }
+  @media (min-width:640px){ .entrycard{ border-radius:24px; } }
+  .entrycard h2{ font-size:20px; font-weight:800; margin:0 0 6px; }
+  .entrycard .lede{ font-size:13.5px; color:var(--ink-soft); margin:0 0 22px; }
+  .field{ margin-bottom:22px; }
+  .field label{ display:block; font-size:13px; font-weight:700; color:var(--ink-soft); margin-bottom:8px; }
+  .field input[type="text"], .field input[type="number"], .field select{
+    width:100%; height:46px; padding:0 13px; font-size:15px; border:1px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--ink); font-family:inherit;
+    box-sizing:border-box; appearance:none; -moz-appearance:textfield; -webkit-appearance:none; }
+  .field input[type="number"]::-webkit-inner-spin-button, .field input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  .field select{ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B655B' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat; background-position:right 12px center; background-size:16px; }
+  .field select:disabled{ opacity:0.45; background-color:var(--paper); }
+  .dategrid{ display:flex; gap:8px; }
+  .dategrid input#mYear{ flex:1.4; } .dategrid input#mMonth, .dategrid input#mDay{ flex:1; }
+  .unknown-time{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); margin-top:-8px; margin-bottom:20px; cursor:pointer; }
+  .unknown-time input{ margin:0; }
+  .err{ font-size:12px; color:var(--fire); margin-top:6px; margin-bottom:14px; display:none; }
+  .cta{ width:100%; padding:14px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; }
+  .ghost-btn{ width:100%; padding:12px; background:transparent; color:var(--ink-soft); border:1px solid var(--line);
+    border-radius:12px; font-size:14px; font-weight:700; font-family:inherit; cursor:pointer; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><div class="mark">A.FECT SAJU</div></div>
+
+  <div class="pagehead">
+    <h1>대기실</h1>
+    <p class="subcopy" id="lobbySubcopy">오늘도 다들 먼저 와 있습니다.</p>
+  </div>
+
+  <div class="typetabs" id="typeTabs"></div>
+  <div class="subtypetabs" id="subTypeTabs"></div>
+  <p class="typecaption" id="typeCaption"></p>
+
+  <div class="lobbyStage" id="lobbyStage">
+    <div class="lobby-empty-msg" id="lobbyEmptyMsg">아직 아무도 없어요.<br>아래에서 첫 멤버로 참여해 보세요.</div>
+  </div>
+
+  <div class="joinRow"><button class="joinBtnPill" id="joinBtn">+ 새 멤버 참여시키기</button></div>
+
+  <div class="selectRow">
+    <button class="selectBtn primary" id="selectAllBtn">전체 선택</button>
+    <button class="selectBtn" id="selectTypeBtn" style="display:none;">이 타입만 선택</button>
+    <button class="selectBtn" id="deselectBtn">선택 해제</button>
+  </div>
+
+  <div class="playbar">
+    <div class="selectioninfo" id="selectionInfo"></div>
+    <div class="playtabs" id="playTabs"></div>
+    <div class="playtoast" id="playToast"></div>
+  </div>
+
+  <div id="playResult"></div>
+
+  <div class="overlay" id="entryOverlay" style="display:none;">
+    <div class="entrycard">
+      <h2>참여하기</h2>
+      <p class="lede">본인 정보를 입력해 주세요.</p>
+      <div class="field"><label for="mNick">닉네임</label><input type="text" id="mNick" placeholder="예: 점머씨"></div>
+      <div class="field"><label>생년월일</label>
+        <div class="dategrid">
+          <input type="number" id="mYear" placeholder="년(4자리)" inputmode="numeric">
+          <input type="number" id="mMonth" placeholder="월" inputmode="numeric">
+          <input type="number" id="mDay" placeholder="일" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field"><label for="mHour">태어난 시각 (시주)</label>
+        <select id="mHour"><option value="" disabled selected>시간을 선택해 주세요</option></select>
+      </div>
+      <label class="unknown-time"><input type="checkbox" id="mUnknown"> 태어난 시각을 몰라요</label>
+      <div class="err" id="addErr"></div>
+      <button class="cta" id="submitEntryBtn">참여 완료</button>
+      <button class="ghost-btn" id="cancelEntryBtn">취소</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ================= Saju engine (검증된 기존 로직 재사용) =================
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const STEM_HANJA = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const STEM_ELEM = ['목','목','화','화','토','토','금','금','수','수'];
+const ZODIAC_EMOJI = ['🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑','🐵','🐔','🐶','🐷'];
+const ELEM_EMOJI = { '목':'🌳','화':'🔥','토':'🪨','금':'⚙️','수':'💧' };
+const ELEM_HANJA = { '목':'木','화':'火','토':'土','금':'金','수':'水' };
+const ELEM_COLOR = { '목':'var(--wood)', '화':'var(--fire)', '토':'var(--earth)', '금':'var(--metal)', '수':'var(--water)' };
+const ELEM_BG = { '목':'var(--wood-bg)', '화':'var(--fire-bg)', '토':'var(--earth-bg)', '금':'var(--metal-bg)', '수':'var(--water-bg)' };
+const GENERATES = {'목':'화','화':'토','토':'금','금':'수','수':'목'};
+const CONTROLS = {'목':'토','토':'수','수':'화','화':'금','금':'목'};
+
+function jdn(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12 * a - 3;
+  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+}
+function dayPillar(y, m, d) { const j = jdn(y, m, d); return { stemIdx: (j + 9) % 10, branchIdx: (j + 1) % 12 }; }
+function toJulianDay(y, m, d, hourFrac) { return jdn(y, m, d) - 0.5 + hourFrac / 24; }
+function solarLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  const Mrad = M * Math.PI / 180;
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad) + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad) + 0.000289 * Math.sin(3 * Mrad);
+  let lon = (L0 + C) % 360; if (lon < 0) lon += 360; return lon;
+}
+function findSolarTermJD(year, approxMonth, targetDeg) {
+  let lo = jdn(year, approxMonth, 1) - 20, hi = jdn(year, approxMonth, 1) + 45;
+  function angDiff(jd) { let diff = solarLongitude(jd) - targetDeg; if (diff > 180) diff -= 360; if (diff < -180) diff += 360; return diff; }
+  for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (angDiff(mid) < 0) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+function yearPillar(effectiveYear) { let diff = effectiveYear - 1984; return { stemIdx: ((diff % 10) + 10) % 10, branchIdx: ((diff % 12) + 12) % 12 }; }
+const MONTH_TERMS = [
+  { deg: 315, branch: 2, approxMonth: 2 },{ deg: 345, branch: 3, approxMonth: 3 },{ deg: 15, branch: 4, approxMonth: 4 },
+  { deg: 45, branch: 5, approxMonth: 5 },{ deg: 75, branch: 6, approxMonth: 6 },{ deg: 105, branch: 7, approxMonth: 7 },
+  { deg: 135, branch: 8, approxMonth: 8 },{ deg: 165, branch: 9, approxMonth: 9 },{ deg: 195, branch: 10, approxMonth: 10 },
+  { deg: 225, branch: 11, approxMonth: 11 },{ deg: 255, branch: 0, approxMonth: 12 },{ deg: 285, branch: 1, approxMonth: 1 },
+];
+function getEffectiveYearAndMonthBranch(y, m, d, hourFrac) {
+  const birthJD = toJulianDay(y, m, d, hourFrac);
+  const termJDs = MONTH_TERMS.map(t => ({...t, jd: findSolarTermJD(y, t.approxMonth, t.deg)}));
+  const sorted = [...termJDs].sort((a,b) => a.jd - b.jd);
+  let monthBranch = null;
+  for (let i = sorted.length - 1; i >= 0; i--) { if (birthJD >= sorted[i].jd) { monthBranch = sorted[i].branch; break; } }
+  if (monthBranch === null) {
+    const prevTerms = [{ deg: 255, branch: 0, approxMonth: 12 },{ deg: 285, branch: 1, approxMonth: 1 }].map(t => ({...t, jd: findSolarTermJD(y - 1, t.approxMonth, t.deg)}));
+    const sortedPrev = prevTerms.sort((a,b)=>a.jd-b.jd);
+    for (let i = sortedPrev.length -1; i>=0; i--) { if (birthJD >= sortedPrev[i].jd) { monthBranch = sortedPrev[i].branch; break; } }
+  }
+  const ipchunJD = findSolarTermJD(y, 2, 315);
+  const effectiveYear = birthJD >= ipchunJD ? y : y - 1;
+  return { effectiveYear, monthBranch };
+}
+const WOHO = { 0:2,5:2, 1:4,6:4, 2:6,7:6, 3:8,8:8, 4:0,9:0 };
+function monthPillar(yearStemIdx, monthBranchIdx) { const inMonthStem = WOHO[yearStemIdx]; const offset = ((monthBranchIdx - 2) + 12) % 12; return { stemIdx: (inMonthStem + offset) % 10, branchIdx: monthBranchIdx }; }
+const OSEO = { 0:0,5:0, 1:2,6:2, 2:4,7:4, 3:6,8:6, 4:8,9:8 };
+function hourPillar(dayStemIdx, branchIdx) { const ziStem = OSEO[dayStemIdx]; return { stemIdx: (ziStem + branchIdx) % 10, branchIdx }; }
+const HOUR_BRANCHES = [
+  { branchIdx:0,  name:'자시', range:'23:00~01:00', representativeHour:0 },{ branchIdx:1,  name:'축시', range:'01:00~03:00', representativeHour:2 },
+  { branchIdx:2,  name:'인시', range:'03:00~05:00', representativeHour:4 },{ branchIdx:3,  name:'묘시', range:'05:00~07:00', representativeHour:6 },
+  { branchIdx:4,  name:'진시', range:'07:00~09:00', representativeHour:8 },{ branchIdx:5,  name:'사시', range:'09:00~11:00', representativeHour:10 },
+  { branchIdx:6,  name:'오시', range:'11:00~13:00', representativeHour:12 },{ branchIdx:7,  name:'미시', range:'13:00~15:00', representativeHour:14 },
+  { branchIdx:8,  name:'신시', range:'15:00~17:00', representativeHour:16 },{ branchIdx:9,  name:'유시', range:'17:00~19:00', representativeHour:18 },
+  { branchIdx:10, name:'술시', range:'19:00~21:00', representativeHour:20 },{ branchIdx:11, name:'해시', range:'21:00~23:00', representativeHour:22 },
+];
+function fullSaju(y, m, d, hourBranchIdx, hasTime) {
+  const representativeHour = hasTime ? HOUR_BRANCHES.find(h => h.branchIdx === hourBranchIdx).representativeHour : 12;
+  const day = dayPillar(y, m, d);
+  const { effectiveYear, monthBranch } = getEffectiveYearAndMonthBranch(y, m, d, representativeHour);
+  const year = yearPillar(effectiveYear);
+  const month = monthPillar(year.stemIdx, monthBranch);
+  const hourP = hasTime ? hourPillar(day.stemIdx, hourBranchIdx) : null;
+  return { year, month, day, hour: hourP };
+}
+const BRANCH_ELEM = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+function fiveElementCounts(saju) {
+  const counts = { '목':0,'화':0,'토':0,'금':0,'수':0 };
+  [saju.year, saju.month, saju.day, saju.hour].filter(Boolean).forEach(p => { counts[STEM_ELEM[p.stemIdx]]++; counts[BRANCH_ELEM[p.branchIdx]]++; });
+  return counts;
+}
+function relOf(elemA, elemB) {
+  if (elemA === elemB) return 'same';
+  if (GENERATES[elemA] === elemB) return 'a-gen-b';
+  if (GENERATES[elemB] === elemA) return 'b-gen-a';
+  if (CONTROLS[elemA] === elemB) return 'a-ctl-b';
+  if (CONTROLS[elemB] === elemA) return 'b-ctl-a';
+  return 'none';
+}
+function weakestElem(counts) { return Object.entries(counts).sort((x,y)=>x[1]-y[1])[0][0]; }
+function strongestElem(counts) { return Object.entries(counts).sort((x,y)=>y[1]-x[1])[0][0]; }
+const TEMPERAMENT = { '목':'init', '화':'init', '토':'balance', '금':'ground', '수':'ground' };
+function clamp(v){ return Math.max(55, Math.min(99, Math.round(v))); }
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ================= 타입 라벨/카피 =================
+const ELEMENTS = ['목','화','토','금','수'];
+const ELEMENT_STEMS = { '목':[0,1], '화':[2,3], '토':[4,5], '금':[6,7], '수':[8,9] };
+const ELEMENT_CAPTION = { '목':'일단 자라나는 사람들', '화':'가만히 있어도 온도가 있는 사람들', '토':'어쨌든 결국 정리하는 사람들', '금':'기준 하나쯤은 확실한 사람들', '수':'흐름을 읽는 사람들' };
+const DAYMASTER_CAPTION = ['크게 키우는 쪽','어떻게든 자라는 쪽','일단 밝히고 보는 쪽','필요한 곳만 정확히 비추는 쪽','버티는 스케일이 큰 쪽','잘 가꾸고 은근 안 바뀌는 쪽','자를 건 자르는 쪽','디테일에 이유가 있는 쪽','판부터 크게 보는 쪽','조용히 다 스며든 쪽'];
+function stemHanjaHangul(stemIdx) { const elem = STEM_ELEM[stemIdx]; return STEM_HANJA[stemIdx] + ELEM_HANJA[elem] + ' · ' + STEMS[stemIdx] + elem; }
+
+// ================= 멤버 상태 / 대기실 스캐터 =================
+let members = [];
+let scatterPos = {};
+let selected = new Set();
+let activeFilter = { type:'all' };
+let activePlay = null;
+let seatingMode = 'oksudong-elem';
+let tableCapacity = 8;
+
+const lobbyStage = document.getElementById('lobbyStage');
+const lobbyEmptyMsg = document.getElementById('lobbyEmptyMsg');
+
+function stageSize() { const r = lobbyStage.getBoundingClientRect(); return { w: r.width || 400, h: r.height || 460 }; }
+function randomJitteredGrid(n, w, h, marginX, marginY) {
+  if (n === 0) return [];
+  const cols = Math.max(1, Math.round(Math.sqrt(n * (w / h))));
+  const rows = Math.ceil(n / cols);
+  const cellW = (w - marginX*2) / cols, cellH = (h - marginY*2) / rows;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const col = i % cols, row = Math.floor(i / cols);
+    const jx = (Math.random() - 0.5) * cellW * 0.55, jy = (Math.random() - 0.5) * cellH * 0.55;
+    const x = marginX + cellW * (col + 0.5) + jx, y = marginY + cellH * (row + 0.5) + jy;
+    pts.push({ x: Math.max(marginX, Math.min(w - marginX, x)), y: Math.max(marginY, Math.min(h - marginY, y)) });
+  }
+  return pts;
+}
+function recomputeScatter() {
+  const { w, h } = stageSize();
+  const pts = randomJitteredGrid(members.length, w, h, 58, 62);
+  scatterPos = {};
+  members.forEach((m, i) => { scatterPos[m.nickname] = pts[i]; });
+}
+function clusterPositions(n, w, h) {
+  if (n === 0) return [];
+  const cols = Math.min(n, Math.max(2, Math.round(Math.sqrt(n))));
+  const rows = Math.ceil(n / cols);
+  const cellW = Math.min(118, w / (cols + 1)), cellH = Math.min(118, h / (rows + 1));
+  const blockW = cellW * cols, blockH = cellH * rows;
+  const startX = w/2 - blockW/2 + cellW/2, startY = h/2 - blockH/2 + cellH/2;
+  const pts = [];
+  for (let i = 0; i < n; i++) { const col = i % cols, row = Math.floor(i / cols); pts.push({ x: startX + col*cellW, y: startY + row*cellH }); }
+  return pts;
+}
+function matchesFilter(mem) {
+  if (activeFilter.type === 'all') return true;
+  if (activeFilter.type === 'elem') return STEM_ELEM[mem.saju.day.stemIdx] === activeFilter.elem;
+  if (activeFilter.type === 'dm') return mem.saju.day.stemIdx === activeFilter.stemIdx;
+  return true;
+}
+function renderLobby() {
+  lobbyEmptyMsg.style.display = members.length === 0 ? 'block' : 'none';
+  lobbyStage.querySelectorAll('.lobby-avatar').forEach(n=>n.remove());
+  if (members.length === 0) return;
+  const { w, h } = stageSize();
+  const matched = members.filter(matchesFilter);
+  const cluster = clusterPositions(matched.length, w, h);
+  members.forEach((mem)=>{
+    const stemIdx = mem.saju.day.stemIdx, branchIdx = mem.saju.day.branchIdx;
+    const node = document.createElement('div');
+    node.className = 'lobby-avatar';
+    if (selected.has(mem.nickname)) node.classList.add('selected');
+    const isMatch = matchesFilter(mem);
+    let pos, delay = 0;
+    if (activeFilter.type === 'all') { pos = scatterPos[mem.nickname] || { x: w/2, y: h/2 }; }
+    else if (isMatch) { const idx = matched.indexOf(mem); pos = cluster[idx]; delay = idx * 35; }
+    else { pos = scatterPos[mem.nickname] || { x: w/2, y: h/2 }; node.classList.add('dimmed'); }
+    node.style.left = pos.x + 'px'; node.style.top = pos.y + 'px'; node.style.transitionDelay = delay + 'ms';
+    node.innerHTML = `<div class="av-circle" style="background:${ELEM_BG[STEM_ELEM[stemIdx]]}">${ZODIAC_EMOJI[branchIdx]}<span class="av-check">✓</span></div>
+      <div class="av-name">${mem.nickname}</div><div class="av-type">${stemHanjaHangul(stemIdx)}</div>`;
+    node.addEventListener('click', ()=> toggleSelect(mem.nickname));
+    lobbyStage.appendChild(node);
+  });
+}
+function toggleSelect(nickname) {
+  if (selected.has(nickname)) selected.delete(nickname); else selected.add(nickname);
+  syncSelectionUI();
+}
+function syncSelectionUI() {
+  document.querySelectorAll('.lobby-avatar').forEach(n=>{
+    const name = n.querySelector('.av-name').textContent;
+    n.classList.toggle('selected', selected.has(name));
+  });
+  updateSelectionInfo();
+  updatePlayTabsState();
+}
+function updateSelectionInfo() {
+  const el = document.getElementById('selectionInfo');
+  const n = selected.size;
+  if (n === 0) el.textContent = '캐릭터를 눌러 멤버를 선택해 보세요.';
+  else if (n === 1) el.textContent = `1명 선택됨 — 한 명 더 골라볼까요?`;
+  else if (n === 2) el.textContent = `2명 선택됨 — 둘이 붙여놓으면?`;
+  else if (n === 3) el.textContent = `3명 선택됨 — 우리 셋이 모이면?`;
+  else el.textContent = `${n}명 선택됨 — 이 멤버 조합 보기`;
+}
+
+// 전체 선택 / 이 타입만 선택 / 선택 해제
+document.getElementById('selectAllBtn').addEventListener('click', ()=>{
+  members.forEach(m=>selected.add(m.nickname));
+  syncSelectionUI();
+});
+document.getElementById('deselectBtn').addEventListener('click', ()=>{
+  selected.clear();
+  syncSelectionUI();
+});
+document.getElementById('selectTypeBtn').addEventListener('click', ()=>{
+  members.filter(matchesFilter).forEach(m=>selected.add(m.nickname));
+  syncSelectionUI();
+});
+
+// ================= 타입 내비게이션 =================
+const typeTabsEl = document.getElementById('typeTabs');
+function renderTypeTabs() {
+  typeTabsEl.innerHTML = `<div class="typetab ${activeFilter.type==='all'?'active':''}" data-elem="all">전체</div>` +
+    ELEMENTS.map(e=>`<div class="typetab ${activeFilter.type==='elem'&&activeFilter.elem===e?'active':''}" data-elem="${e}">${e}</div>`).join('');
+  typeTabsEl.querySelectorAll('.typetab').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const e = el.dataset.elem;
+      if (e === 'all') activeFilter = { type:'all' };
+      else if (activeFilter.type==='elem' && activeFilter.elem===e) activeFilter = { type:'all' };
+      else activeFilter = { type:'elem', elem:e };
+      onFilterChanged();
+    });
+  });
+}
+function renderSubTypeTabs() {
+  const sub = document.getElementById('subTypeTabs');
+  if (activeFilter.type !== 'elem') { sub.classList.remove('show'); sub.innerHTML=''; return; }
+  const stems = ELEMENT_STEMS[activeFilter.elem];
+  sub.classList.add('show');
+  sub.innerHTML = stems.map(si=>`<div class="subtypetab" data-stem="${si}">${STEM_HANJA[si]} ${STEMS[si]}${STEM_ELEM[si]}</div>`).join('');
+  sub.querySelectorAll('.subtypetab').forEach(el=>{
+    const si = Number(el.dataset.stem);
+    el.classList.toggle('active', activeFilter.type==='dm' && activeFilter.stemIdx===si);
+    el.addEventListener('click', ()=>{
+      if (activeFilter.type==='dm' && activeFilter.stemIdx===si) activeFilter = { type:'elem', elem: STEM_ELEM[si] };
+      else activeFilter = { type:'dm', stemIdx: si };
+      onFilterChanged();
+    });
+  });
+}
+function renderTypeCaption() {
+  const cap = document.getElementById('typeCaption');
+  if (activeFilter.type === 'all') cap.textContent = '';
+  else if (activeFilter.type === 'elem') cap.textContent = `${activeFilter.elem} · ${ELEMENT_CAPTION[activeFilter.elem]}`;
+  else if (activeFilter.type === 'dm') cap.textContent = `${STEMS[activeFilter.stemIdx]}${STEM_ELEM[activeFilter.stemIdx]} · ${DAYMASTER_CAPTION[activeFilter.stemIdx]}`;
+}
+function onFilterChanged() {
+  renderTypeTabs(); renderSubTypeTabs(); renderTypeCaption(); renderLobby();
+  document.getElementById('selectTypeBtn').style.display = activeFilter.type==='all' ? 'none' : 'inline-block';
+}
+
+// ================= 참여(entry) 오버레이 =================
+const hourSelectEl = document.getElementById('mHour');
+HOUR_BRANCHES.forEach(h=>{ const opt = document.createElement('option'); opt.value = h.branchIdx; opt.textContent = `${h.name} (${h.range})`; hourSelectEl.appendChild(opt); });
+document.getElementById('mUnknown').addEventListener('change', e=>{ hourSelectEl.disabled = e.target.checked; if (e.target.checked) hourSelectEl.value = ''; });
+function clampDateInput(id, maxDigits, max) {
+  const el = document.getElementById(id);
+  el.addEventListener('input', ()=>{ let v = el.value.replace(/[^0-9]/g, '').slice(0, maxDigits); if (v !== '') { let num = Number(v); if (num > max) { num = max; v = String(num); } } el.value = v; });
+}
+clampDateInput('mYear', 4, 2100); clampDateInput('mMonth', 2, 12); clampDateInput('mDay', 2, 31);
+
+const entryOverlay = document.getElementById('entryOverlay');
+function resetEntryForm() {
+  document.getElementById('mNick').value = ''; document.getElementById('mYear').value = '';
+  document.getElementById('mMonth').value = ''; document.getElementById('mDay').value = '';
+  document.getElementById('mUnknown').checked = false; hourSelectEl.disabled = false; hourSelectEl.value = '';
+  document.getElementById('addErr').style.display = 'none';
+}
+document.getElementById('joinBtn').addEventListener('click', ()=>{ resetEntryForm(); entryOverlay.style.display = 'flex'; });
+document.getElementById('cancelEntryBtn').addEventListener('click', ()=>{ entryOverlay.style.display = 'none'; });
+document.getElementById('submitEntryBtn').addEventListener('click', ()=>{
+  const nickname = document.getElementById('mNick').value.trim();
+  const yVal = document.getElementById('mYear').value, mVal = document.getElementById('mMonth').value, dVal = document.getElementById('mDay').value;
+  const unknown = document.getElementById('mUnknown').checked, hourVal = hourSelectEl.value;
+  const errEl = document.getElementById('addErr');
+  if (!nickname) { errEl.textContent = '닉네임을 입력해 주세요.'; errEl.style.display='block'; return; }
+  if (yVal.length !== 4 || !mVal || !dVal) { errEl.textContent = '생년월일을 년(4자리)/월/일 모두 입력해 주세요.'; errEl.style.display='block'; return; }
+  if (!unknown && hourVal === '') { errEl.textContent = '태어난 시각을 선택하거나 "모름"을 체크해 주세요.'; errEl.style.display='block'; return; }
+  errEl.style.display = 'none';
+  const y = Number(yVal), m = Number(mVal), d = Number(dVal);
+  const hasTime = !unknown;
+  const saju = fullSaju(y, m, d, hasTime ? Number(hourVal) : null, hasTime);
+  members.push({ nickname, saju, hasTime, counts: fiveElementCounts(saju) });
+  recomputeScatter();
+  entryOverlay.style.display = 'none';
+  renderLobby();
+});
+window.addEventListener('load', ()=>{ recomputeScatter(); renderLobby(); });
+setTimeout(()=>{ recomputeScatter(); renderLobby(); }, 0);
+renderTypeTabs();
+
+// ================= PLAY 메뉴 (5종 모두 실제 동작) =================
+const PLAY_ITEMS = [
+  { id:'seating', title:'자리배치', minSelect:2 },
+  { id:'chemi', title:'그룹 케미', minSelect:2 },
+  { id:'lunch', title:'오늘 뭐 먹지?', minSelect:2 },
+  { id:'recharge', title:'오행 충전소', minSelect:1 },
+];
+const playTabsEl = document.getElementById('playTabs');
+playTabsEl.innerHTML = PLAY_ITEMS.map(p=>`<div class="playtab" data-id="${p.id}">${p.title}</div>`).join('');
+playTabsEl.querySelectorAll('.playtab').forEach(el=>{
+  el.addEventListener('click', ()=> activatePlay(el.dataset.id));
+});
+function activatePlay(id) {
+  const item = PLAY_ITEMS.find(p=>p.id===id);
+  const toast = document.getElementById('playToast');
+  if (selected.size < item.minSelect) {
+    toast.style.display = 'block';
+    toast.textContent = `멤버를 ${item.minSelect}명 이상 선택해 주세요.`;
+    return;
+  }
+  toast.style.display = 'none';
+  document.querySelectorAll('.playtab').forEach(t=>t.classList.toggle('active', t.dataset.id===id));
+  activePlay = id;
+  renderPlayResult();
+}
+function updatePlayTabsState() {
+  playTabsEl.querySelectorAll('.playtab').forEach(el=>{
+    const item = PLAY_ITEMS.find(p=>p.id===el.dataset.id);
+    el.classList.toggle('disabled', selected.size < item.minSelect);
+  });
+  if (activePlay) {
+    const item = PLAY_ITEMS.find(p=>p.id===activePlay);
+    if (selected.size < item.minSelect) {
+      document.getElementById('playResult').style.display = 'none';
+      activePlay = null;
+      document.querySelectorAll('.playtab').forEach(t=>t.classList.remove('active'));
+    } else {
+      renderPlayResult();
+    }
+  }
+}
+updateSelectionInfo();
+updatePlayTabsState();
+
+function renderPlayResult() {
+  const box = document.getElementById('playResult');
+  box.style.display = 'block';
+  box.innerHTML = '';
+  const selMembers = members.filter(m=>selected.has(m.nickname));
+  if (activePlay === 'seating') renderSeatingResult(box, selMembers);
+  else if (activePlay === 'chemi') {
+    if (selMembers.length === 2) renderPairChemiResult(box, selMembers[0], selMembers[1]);
+    else renderGroupChemiResult(box, selMembers);
+  }
+  else if (activePlay === 'lunch') renderLunchResult(box, selMembers);
+  else if (activePlay === 'recharge') renderRechargeResult(box, selMembers);
+}
+function nextActionBar(box, actions) {
+  const row = document.createElement('div');
+  row.className = 'nextactions';
+  actions.forEach(a=>{
+    const btn = document.createElement('button');
+    btn.className = 'nextbtn'; btn.textContent = a.label;
+    btn.addEventListener('click', a.onClick);
+    row.appendChild(btn);
+  });
+  box.appendChild(row);
+}
+
+// ================= 케미/궁합 스코어 =================
+function compatibilityScore(a, b) {
+  const elemA = STEM_ELEM[a.saju.day.stemIdx], elemB = STEM_ELEM[b.saju.day.stemIdx];
+  const rel = relOf(elemA, elemB);
+  let score = 65;
+  if (rel==='a-gen-b'||rel==='b-gen-a') score += 18;
+  else if (rel==='same') score += 10;
+  else if (rel==='a-ctl-b'||rel==='b-ctl-a') score += 6;
+  else score += 12;
+  if (b.counts[weakestElem(a.counts)] > 0) score += 6;
+  if (a.counts[weakestElem(b.counts)] > 0) score += 6;
+  if (a.saju.day.stemIdx === b.saju.day.stemIdx) score -= 4;
+  return clamp(score);
+}
+function subScores(a, b) {
+  const elemA = STEM_ELEM[a.saju.day.stemIdx], elemB = STEM_ELEM[b.saju.day.stemIdx];
+  const rel = relOf(elemA, elemB);
+  const ta = TEMPERAMENT[elemA], tb = TEMPERAMENT[elemB];
+  const complement = (ta==='init'&&tb==='ground')||(ta==='ground'&&tb==='init');
+  const sameTemp = ta===tb;
+  const gen = rel==='a-gen-b'||rel==='b-gen-a', ctl = rel==='a-ctl-b'||rel==='b-ctl-a';
+  const idea = clamp(70 + (complement?20:0) + (sameTemp?-8:0) + (gen?6:0));
+  const work = clamp(66 + (gen?20:0) + (b.counts[weakestElem(a.counts)]>0?6:0) + (a.counts[weakestElem(b.counts)]>0?6:0));
+  const lunch = clamp(76 + (elemA===elemB?18:8));
+  const talk = clamp(68 + (gen?20: rel==='same'?14:8));
+  const peace = clamp(90 - (ctl?24:0));
+  return { idea, work, lunch, talk, peace };
+}
+const IDEA_LINES = { hi:'한 명이 던지면 한 명이 바로 받아칩니다. 아이디어가 멈추질 않습니다.', lo:'속도는 다르지만, 결국 같은 결승점에서 만납니다.' };
+const WORK_LINES = { hi:'한 명이 방향을 잡으면 다른 한 명이 바로 실행에 들어갑니다.', lo:'스타일은 다르지만 마감 앞에서는 손발이 맞습니다.' };
+const LUNCH_LINES = { hi:'메뉴는 빨리 정합니다. 둘 다 배고픈 걸 오래 못 참는 쪽이거든요.', lo:'취향은 달라도 결국 둘 다 맛있게 먹습니다.' };
+const TALK_LINES = { hi:'대화가 끊기질 않습니다. 한 마디만 던져도 세 마디가 돌아옵니다.', lo:'말수는 적어도 필요한 순간엔 정확하게 통합니다.' };
+const PEACE_LINES = { hi:'부딪힐 일이 거의 없는, 편안하게 흘러가는 조합입니다.', lo:'가끔 부딪혀도 금방 제자리로 돌아옵니다.' };
+function subLine(bank, val) { return val >= 85 ? bank.hi : bank.lo; }
+
+// ================= 점심/럭키 아이템 데이터 =================
+const FOOD_TYPE = { '화':'매운맛 · 화끈한 메뉴', '토':'든든한 밥심 메뉴', '금':'깔끔하고 빠른 결정 메뉴', '수':'국물 · 면 위주 유동적 메뉴', '목':'가볍고 새로운 메뉴' };
+const LUCKY_ITEMS = {
+  '목': { item:'작은 화분', copy:'책상 위에 성장 버튼 하나. 초록 한 스푼 추가해볼까요?' },
+  '화': { item:'따뜻한 무드등', copy:'불씨가 조금 아쉽습니다. 장작 대신 조명부터 켜보죠.' },
+  '토': { item:'도자기 화분', copy:'흔들리는 건 화면 탭만으로 충분합니다. 책상엔 묵직한 한 점.' },
+  '금': { item:'메탈 데스크 오거나이저', copy:'정리 버튼을 물성으로 만들어두는 타입. 반듯한 금속 한 점이 잘 어울립니다.' },
+  '수': { item:'미니 가습기', copy:'흐르는 느낌을 책상에 살짝. 너무 거창할 필요는 없습니다.' },
+};
+const COMBO_ITEMS = {
+  '수-화': { item:'모닥불 가습기', copy:'불처럼 생겼는데 물을 뿜습니다. 이 조합을 위해 태어난 건 아닐 텐데, 결과적으로 지나치게 적절합니다.' },
+  '목-토': { item:'작은 화분 + 도자기 받침', copy:'한 명은 나무가 필요하고 한 명은 흙이 필요합니다. 화분 하나로 회의가 끝났습니다.' },
+};
+function comboKey(e1, e2) { return [e1,e2].sort().join('-'); }
+
+// ================= 관계 설명 문구 (관찰형 유머 톤, 명리 용어는 근거에서만) =================
+const GEN_HEADLINES = [
+  h => `${h.giver}님이 "이거 해볼까?" 하면 ${h.getter}님이 바로 "좋아요, 근데 언제까지요?"를 묻습니다.`,
+  h => `한 명이 판을 벌이면, 다른 한 명은 이미 엑셀을 열고 있습니다.`,
+  h => `회의 시작 5분 만에 ${h.giver}님은 아이디어를 냈고, ${h.getter}님은 일정표를 만들고 있습니다.`,
+];
+const SAME_HEADLINES = [
+  () => '둘 다 기준이 확실합니다. 문제는 기준이 같은 날엔 세상 편하고, 다른 날엔 회의가 조금 길어집니다.',
+  () => '같은 파장으로 움직이는 두 사람. 말이 길어질수록 오히려 결론은 빨리 납니다.',
+];
+const CTL_HEADLINES = [
+  h => `${h.leader}님이 은근슬쩍 브레이크를 잡아줍니다. 덕분에 계획이 산으로 안 갑니다.`,
+  () => '한쪽이 속도를 내면 다른 쪽이 방향을 확인합니다. 티격태격해도 결국 제대로 갑니다.',
+];
+const NONE_HEADLINES = [
+  () => '서로 겹치는 구석이 별로 없어서, 둘이 있으면 대화 소재가 늘 새롭습니다.',
+  () => '다른 리듬으로 움직이는 조합이라 자리가 심심할 틈이 없습니다.',
+];
+function buildPairExplanation(memA, memB) {
+  const elemA = STEM_ELEM[memA.saju.day.stemIdx], elemB = STEM_ELEM[memB.saju.day.stemIdx];
+  const glyphA = STEMS[memA.saju.day.stemIdx]+elemA, glyphB = STEMS[memB.saju.day.stemIdx]+elemB;
+  const rel = relOf(elemA, elemB);
+  const weakA = weakestElem(memA.counts), weakB = weakestElem(memB.counts);
+  const fillsA = memB.counts[weakA] > 0, fillsB = memA.counts[weakB] > 0;
+  let headline, summary, evidence;
+  if (rel === 'a-gen-b' || rel === 'b-gen-a') {
+    const giver = rel==='a-gen-b' ? memA : memB, getter = rel==='a-gen-b' ? memB : memA;
+    const giverElem = rel==='a-gen-b' ? elemA : elemB, getterElem = rel==='a-gen-b' ? elemB : elemA;
+    const giverGlyph = rel==='a-gen-b' ? glyphA : glyphB, getterGlyph = rel==='a-gen-b' ? glyphB : glyphA;
+    headline = pick(GEN_HEADLINES)({ giver: giver.nickname, getter: getter.nickname });
+    summary = `${giver.nickname}님은 방향을 넓히고, ${getter.nickname}님은 그걸 실행 가능한 선으로 정리하는 역할을 하기 쉬워요.`;
+    evidence = `${giver.nickname}(${giverGlyph}) → ${getter.nickname}(${getterGlyph}) : ${giverElem}이 ${getterElem}을 생(生)하는 관계.`;
+  } else if (rel === 'same') {
+    headline = pick(SAME_HEADLINES)();
+    summary = `${memA.nickname}님과 ${memB.nickname}님 모두 ${elemA} 기운의 일간이라, 서로 말이 잘 통하는 자리예요.`;
+    evidence = `${memA.nickname}(${glyphA}) · ${memB.nickname}(${glyphB}) : 같은 오행의 일간(비화 관계).`;
+  } else if (rel === 'a-ctl-b' || rel === 'b-ctl-a') {
+    const leader = rel==='a-ctl-b' ? memA : memB, other = rel==='a-ctl-b' ? memB : memA;
+    const leaderGlyph = rel==='a-ctl-b' ? glyphA : glyphB, otherGlyph = rel==='a-ctl-b' ? glyphB : glyphA;
+    headline = pick(CTL_HEADLINES)({ leader: leader.nickname });
+    summary = `${leader.nickname}님의 기운이 ${other.nickname}님의 기운을 다잡아주는 관계라, 방향이 흐트러질 때 중심을 잡기 좋습니다.`;
+    evidence = `${leader.nickname}(${leaderGlyph}) → ${other.nickname}(${otherGlyph}) : 극(剋)하는 관계지만 인접 배치에서는 자극이 되기도 합니다.`;
+  } else {
+    headline = pick(NONE_HEADLINES)();
+    summary = `${memA.nickname}님과 ${memB.nickname}님은 직접적인 상생·상극 관계는 아니지만, 오행 구성이 달라서 자리가 단조롭지 않아요.`;
+    evidence = `${memA.nickname}(${glyphA}) · ${memB.nickname}(${glyphB}) : 오행이 달라 대화 결이 다양해지는 조합.`;
+  }
+  const fillLines = [];
+  if (fillsA) fillLines.push(`${memB.nickname}님이 ${weakA} 기운을 갖고 있어 ${memA.nickname}님의 약한 부분(${weakA})을 채워줄 수 있어요.`);
+  if (fillsB) fillLines.push(`${memA.nickname}님도 ${weakB} 기운을 갖고 있어 ${memB.nickname}님의 약한 부분(${weakB})을 채워줍니다.`);
+  const detail = (`${memA.nickname}님은 오행 중 ${weakA}이 가장 약하고, ${memB.nickname}님은 ${weakB}이 가장 약합니다. ` + fillLines.join(' ')).trim();
+  return { headline, summary, evidence, detail };
+}
+
+// ================= 좌석 알고리즘 =================
+function pairScoreElem(a, b) {
+  const ea = STEM_ELEM[a.saju.day.stemIdx], eb = STEM_ELEM[b.saju.day.stemIdx];
+  let score = 0;
+  if (b.counts[weakestElem(a.counts)] > 0) score += 2;
+  if (a.counts[weakestElem(b.counts)] > 0) score += 2;
+  if (ea !== eb) score += 1;
+  if (a.saju.day.stemIdx === b.saju.day.stemIdx) score -= 3;
+  return score;
+}
+function pairScoreIlgan(a, b) {
+  const rel = relOf(STEM_ELEM[a.saju.day.stemIdx], STEM_ELEM[b.saju.day.stemIdx]);
+  if (rel === 'a-gen-b' || rel === 'b-gen-a') return 4;
+  if (rel === 'same') return 2;
+  if (rel === 'a-ctl-b' || rel === 'b-ctl-a') return -2;
+  return 0;
+}
+const MODE_SCORERS = { 'oksudong-elem':pairScoreElem, 'oksudong-ilgan':pairScoreIlgan };
+const MODE_INFO = {
+  'oksudong-elem': { title:'옥수동 뉴 사무실 자리배치 · 오행', lede:'오행 밸런스를 기준으로 서로 부족한 기운을 채워주는 조합.' },
+  'oksudong-ilgan': { title:'옥수동 뉴 사무실 자리배치 · 일간', lede:'일간(예: 기토, 정화)끼리의 상생·상극 관계를 기준으로 짠 조합.' },
+};
+function scoreArrangement(order, mode) {
+  if (order.length < 2) return 0;
+  const fn = MODE_SCORERS[mode]; let total = 0;
+  for (let i = 0; i < order.length; i++) total += fn(order[i], order[(i+1) % order.length]);
+  return total;
+}
+function permute(arr) {
+  if (arr.length <= 1) return [arr];
+  const result = [];
+  for (let i = 0; i < arr.length; i++) { const rest = arr.slice(0,i).concat(arr.slice(i+1)); permute(rest).forEach(p => result.push([arr[i], ...p])); }
+  return result;
+}
+function bestArrangement(list, mode) {
+  if (list.length <= 1) return list;
+  const first = list[0]; const perms = permute(list.slice(1));
+  let best = null, bestScore = -Infinity;
+  perms.forEach(p=>{ const order = [first, ...p]; const s = scoreArrangement(order, mode); if (s > bestScore) { bestScore = s; best = order; } });
+  return best;
+}
+function splitIntoTables(list, capacity) {
+  const numTables = Math.max(1, Math.ceil(list.length / capacity));
+  const base = Math.floor(list.length / numTables), remainder = list.length % numTables;
+  const groups = []; let idx = 0;
+  for (let t = 0; t < numTables; t++) { const count = base + (t < remainder ? 1 : 0); groups.push(list.slice(idx, idx + count)); idx += count; }
+  return groups;
+}
+function getGeo() { return { seatSlot:118, tableWidth:220, tableHeight:66, seatRowGap:74, sidePad:60, circleD:64 }; }
+function layoutToGrid(order, geo) {
+  const n = order.length;
+  const topCount = Math.ceil(n / 2), bottomCount = n - topCount;
+  const topMembers = order.slice(0, topCount), bottomMembers = order.slice(topCount).reverse();
+  const maxCount = Math.max(topCount, bottomCount, 1);
+  const rowSpread = (maxCount - 1) * geo.seatSlot;
+  const boxWidth = Math.max(rowSpread, geo.tableWidth) + geo.sidePad * 2;
+  const boxHeight = geo.tableHeight + geo.seatRowGap * 2 + 56;
+  const cx = boxWidth / 2, cy = boxHeight / 2;
+  function rowX(i, count) { if (count === 0) return cx; const start = cx - ((count - 1) / 2) * geo.seatSlot; return start + i * geo.seatSlot; }
+  const topY = cy - geo.tableHeight/2 - geo.seatRowGap, bottomY = cy + geo.tableHeight/2 + geo.seatRowGap;
+  const topPos = topMembers.map((mem,i)=> ({ mem, x: rowX(i, topCount), y: topY }));
+  const bottomPos = bottomMembers.map((mem,i)=> ({ mem, x: rowX(i, bottomCount), y: bottomY }));
+  return { topPos, bottomPos, boxWidth, boxHeight, tableWidth: geo.tableWidth, tableHeight: geo.tableHeight, cx, cy };
+}
+function buildGridConnectors(topPos, bottomPos) {
+  const list = [];
+  for (let i = 0; i < topPos.length - 1; i++) list.push([topPos[i], topPos[i+1]]);
+  for (let i = 0; i < bottomPos.length - 1; i++) list.push([bottomPos[i], bottomPos[i+1]]);
+  const n = topPos.length + bottomPos.length;
+  if (topPos.length && bottomPos.length) {
+    if (n === 2) list.push([topPos[0], bottomPos[0]]);
+    else { list.push([topPos[topPos.length-1], bottomPos[bottomPos.length-1]]); list.push([bottomPos[0], topPos[0]]); }
+  }
+  return list;
+}
+
+// ================= 결과 렌더링: 자리배치 =================
+function renderSeatingResult(box, selMembers) {
+  const head = document.createElement('div');
+  head.className = 'resulthead';
+  head.innerHTML = `<h2>옥수동 뉴 사무실, 자리 한번 짜볼까요?</h2>`;
+  box.appendChild(head);
+
+  const capRow = document.createElement('div');
+  capRow.className = 'capchiprow';
+  [4,6,8].forEach(cap=>{
+    const chip = document.createElement('div');
+    chip.className = 'capchip' + (tableCapacity===cap?' active':'');
+    chip.textContent = cap + '인 테이블';
+    chip.addEventListener('click', ()=>{ tableCapacity = cap; renderPlayResult(); });
+    capRow.appendChild(chip);
+  });
+  box.appendChild(capRow);
+
+  const subtabs = document.createElement('div');
+  subtabs.className = 'seatsubtabs';
+  [['oksudong-elem','오행 기준'],['oksudong-ilgan','일간 기준']].forEach(([id,label])=>{
+    const t = document.createElement('div');
+    t.className = 'seatsubtab' + (seatingMode===id?' active':'');
+    t.textContent = label;
+    t.addEventListener('click', ()=>{ seatingMode = id; renderPlayResult(); });
+    subtabs.appendChild(t);
+  });
+  box.appendChild(subtabs);
+
+  const lede = document.createElement('p');
+  lede.className = 'resulthead lede';
+  lede.style.marginTop = '-8px';
+  lede.textContent = MODE_INFO[seatingMode].lede;
+  box.appendChild(lede);
+
+  const grid2 = document.createElement('div');
+  grid2.className = 'tables-grid';
+  grid2.style.marginTop = '8px';
+  box.appendChild(grid2);
+
+  const groups = splitIntoTables(selMembers, tableCapacity);
+  const geo = getGeo();
+  const totalTables = groups.length;
+  const useElemEmoji = seatingMode === 'oksudong-elem';
+
+  groups.forEach((group, tableIndex)=>{
+    const order = bestArrangement(group, seatingMode);
+    const card = document.createElement('div');
+    card.className = 'table-card';
+    if (totalTables > 1) {
+      const lbl = document.createElement('div');
+      lbl.className = 'tablabel'; lbl.textContent = `테이블 ${tableIndex+1} (${order.length}명)`;
+      card.appendChild(lbl);
+    }
+    const grid = layoutToGrid(order, geo);
+    const tablewrap = document.createElement('div');
+    tablewrap.className = 'tablewrap';
+    tablewrap.style.width = grid.boxWidth + 'px'; tablewrap.style.height = grid.boxHeight + 'px';
+
+    const tableRect = document.createElement('div');
+    tableRect.className = 'table-rect';
+    tableRect.style.width = grid.tableWidth + 'px'; tableRect.style.height = grid.tableHeight + 'px'; tableRect.style.zIndex = '1';
+    tablewrap.appendChild(tableRect);
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', grid.boxWidth); svg.setAttribute('height', grid.boxHeight);
+    svg.setAttribute('viewBox', `0 0 ${grid.boxWidth} ${grid.boxHeight}`);
+    svg.style.position = 'absolute'; svg.style.left = '0'; svg.style.top = '0'; svg.style.zIndex = '2';
+    tablewrap.appendChild(svg);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'pair-tooltip';
+    tooltip.innerHTML = `<div class="tt-names"></div><div class="tt-headline"></div><div class="tt-summary"></div><div class="tt-evidence"></div>`;
+    tablewrap.appendChild(tooltip);
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    buildGridConnectors(grid.topPos, grid.bottomPos).forEach((pair, ci)=>{
+      const [a, b] = pair;
+      const path = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+      const g = document.createElementNS(svgNS, 'g'); g.classList.add('connector-group');
+      const visible = document.createElementNS(svgNS, 'path');
+      visible.setAttribute('d', path); visible.setAttribute('fill', 'none'); visible.setAttribute('stroke', 'var(--line)'); visible.setAttribute('stroke-width', '2');
+      visible.classList.add('connector-visible'); g.appendChild(visible);
+      const mid = { x:(a.x+b.x)/2, y:(a.y+b.y)/2 };
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', mid.x); dot.setAttribute('cy', mid.y); dot.setAttribute('r', 6); dot.setAttribute('fill', 'var(--accent)');
+      dot.classList.add('connector-dot'); dot.style.animationDelay = (ci*0.3)+'s'; dot.style.pointerEvents = 'all';
+      g.appendChild(dot);
+      const hit = document.createElementNS(svgNS, 'path');
+      hit.setAttribute('d', path); hit.setAttribute('fill', 'none'); hit.setAttribute('stroke', 'transparent'); hit.setAttribute('stroke-width', '24');
+      hit.classList.add('connector-hit'); g.appendChild(hit);
+      function fillTooltip() {
+        const exp = buildPairExplanation(a.mem, b.mem);
+        tooltip.querySelector('.tt-names').textContent = `${a.mem.nickname} × ${b.mem.nickname}`;
+        tooltip.querySelector('.tt-headline').textContent = exp.headline;
+        tooltip.querySelector('.tt-summary').textContent = exp.summary;
+        tooltip.querySelector('.tt-evidence').textContent = '왜냐하면? ' + exp.evidence + ' ' + exp.detail;
+      }
+      function positionTooltip() {
+        tooltip.style.display = 'block';
+        const ttRect = tooltip.getBoundingClientRect(), wrapRect = tablewrap.getBoundingClientRect(), tableRectBox = tableRect.getBoundingClientRect();
+        const viewportW = window.innerWidth || 375;
+        const spaceRight = viewportW - tableRectBox.right, spaceLeft = tableRectBox.left;
+        let pageLeft = (spaceRight >= ttRect.width + 16 || spaceRight >= spaceLeft) ? tableRectBox.right + 14 : tableRectBox.left - ttRect.width - 14;
+        pageLeft = Math.max(8, Math.min(pageLeft, viewportW - ttRect.width - 8));
+        tooltip.style.left = Math.round(pageLeft - wrapRect.left) + 'px';
+        tooltip.style.top = Math.max(4, Math.round((tableRectBox.top - wrapRect.top) + (tableRectBox.height/2) - (ttRect.height/2 || 100))) + 'px';
+      }
+      let hideTimer = null;
+      function show() { clearTimeout(hideTimer); fillTooltip(); positionTooltip(); }
+      function hide() { tooltip.style.display = 'none'; }
+      g.addEventListener('mouseenter', show); g.addEventListener('mouseleave', hide);
+      g.addEventListener('touchstart', ()=>{ show(); clearTimeout(hideTimer); hideTimer = setTimeout(hide, 3800); }, { passive:true });
+      svg.appendChild(g);
+    });
+
+    [...grid.topPos, ...grid.bottomPos].forEach(seat=>{
+      const mem = seat.mem;
+      const stemIdx = mem.saju.day.stemIdx, elem = STEM_ELEM[stemIdx], branchIdx = mem.saju.day.branchIdx;
+      const emoji = useElemEmoji ? ELEM_EMOJI[elem] : ZODIAC_EMOJI[branchIdx];
+      const node = document.createElement('div');
+      node.className = 'seat-node';
+      node.style.left = seat.x + 'px'; node.style.top = seat.y + 'px'; node.style.transform = 'translate(-50%,-50%)';
+      node.innerHTML = `<div class="circle" style="background:${ELEM_BG[elem]}; width:${geo.circleD}px; height:${geo.circleD}px; font-size:30px;">${emoji}</div>
+        <div class="label" style="font-size:13px; max-width:96px;">${mem.nickname}</div>
+        <div class="typecap" style="font-size:11px;">${useElemEmoji ? elem : stemHanjaHangul(stemIdx)}</div>`;
+      tablewrap.appendChild(node);
+    });
+    card.appendChild(tablewrap);
+
+    const teamCounts = { '목':0,'화':0,'토':0,'금':0,'수':0 };
+    order.forEach(m => { Object.keys(teamCounts).forEach(k => teamCounts[k] += m.counts[k]); });
+    const total = Object.values(teamCounts).reduce((a,b)=>a+b,0) || 1;
+    const sortedTeam = Object.entries(teamCounts).sort((a,b)=>b[1]-a[1]).filter(([k,v])=>v>0);
+    const balDiv = document.createElement('div');
+    balDiv.className = 'teambalance-below';
+    balDiv.innerHTML = `<div class="tblabel">TEAM BALANCE</div>
+      <div class="tbar">${Object.entries(teamCounts).map(([k,v])=>{ const pct=(v/total*100).toFixed(1); return v>0 ? `<span style="width:${pct}%;background:${ELEM_COLOR[k]}"></span>` : ''; }).join('')}</div>
+      <div class="tnote">${sortedTeam.map(([k,v])=>`${k} ${Math.round(v/total*100)}%`).join(' · ')}</div>`;
+    card.appendChild(balDiv);
+    grid2.appendChild(card);
+  });
+
+  nextActionBar(box, [
+    { label:'점심 케미 보기', onClick: ()=> activatePlay('lunch') },
+    { label:'럭키템 보기', onClick: ()=> activatePlay('recharge') },
+  ]);
+}
+
+// ================= 결과 렌더링: 2인 케미 =================
+function renderPairChemiResult(box, a, b) {
+  const emA = ZODIAC_EMOJI[a.saju.day.branchIdx], emB = ZODIAC_EMOJI[b.saju.day.branchIdx];
+  const score = compatibilityScore(a, b);
+  const exp = buildPairExplanation(a, b);
+  const subs = subScores(a, b);
+
+  const head = document.createElement('div');
+  head.className = 'resulthead';
+  head.innerHTML = `<div class="chemihead">
+      <div class="chip"><span class="em">${emA}</span>${a.nickname}</div>
+      <span style="color:var(--ink-faint); font-weight:700;">×</span>
+      <div class="chip"><span class="em">${emB}</span>${b.nickname}</div>
+    </div>`;
+  box.appendChild(head);
+
+  const scoreWrap = document.createElement('div');
+  scoreWrap.innerHTML = `<div class="scoreBig">${score}</div><div class="scoreLabel">케미 지수</div>`;
+  box.appendChild(scoreWrap);
+
+  const card = document.createElement('div');
+  card.className = 'resultcard';
+  card.innerHTML = `
+    <div class="rheadline">${exp.headline}</div>
+    <div class="rbody">${exp.summary}</div>
+    <div class="rtoggle">왜 ${score}점이지?</div>
+    <div class="rdetail">${exp.evidence} ${exp.detail}</div>
+  `;
+  card.querySelector('.rtoggle').addEventListener('click', function(){
+    const d = card.querySelector('.rdetail');
+    const open = d.style.display === 'block';
+    d.style.display = open ? 'none' : 'block';
+    this.textContent = open ? `왜 ${score}점이지?` : '접기';
+  });
+  box.appendChild(card);
+
+  const subgrid = document.createElement('div');
+  subgrid.className = 'subscoregrid';
+  const subDefs = [
+    { key:'idea', em:'💡', cap:'아이디어 케미', bank:IDEA_LINES },
+    { key:'work', em:'💼', cap:'업무 케미', bank:WORK_LINES },
+    { key:'lunch', em:'🍚', cap:'점심 케미', bank:LUNCH_LINES },
+    { key:'talk', em:'🗣', cap:'대화 케미', bank:TALK_LINES },
+    { key:'peace', em:'🧘', cap:'평화 지수', bank:PEACE_LINES },
+  ];
+  subDefs.forEach(d=>{
+    const val = subs[d.key];
+    const c = document.createElement('div');
+    c.className = 'subscorecard';
+    c.innerHTML = `<div class="em">${d.em}</div><div class="cap">${d.cap}</div><div class="val">${val}</div><div class="line">${subLine(d.bank, val)}</div>`;
+    subgrid.appendChild(c);
+  });
+  box.appendChild(subgrid);
+
+  nextActionBar(box, [
+    { label:'점심 케미 자세히', onClick: ()=> activatePlay('lunch') },
+    { label:'럭키템 보기', onClick: ()=> activatePlay('recharge') },
+    { label:'자리도 짜볼까?', onClick: ()=> activatePlay('seating') },
+  ]);
+}
+
+// ================= 결과 렌더링: 그룹 케미(3명 이상) =================
+const ROLE_LABEL = { init:'판 벌리기 담당', ground:'현실 체크 담당', balance:'정리 담당' };
+function renderGroupChemiResult(box, list) {
+  const head = document.createElement('div');
+  head.className = 'resulthead';
+  head.innerHTML = `<h2>이 팀의 캐릭터</h2><p class="lede">${list.length}명이 모이면 이렇게 됩니다.</p>`;
+  box.appendChild(head);
+
+  const roleGrid = document.createElement('div');
+  roleGrid.className = 'roleGrid';
+  list.forEach(m=>{
+    const elem = STEM_ELEM[m.saju.day.stemIdx];
+    const role = ROLE_LABEL[TEMPERAMENT[elem]];
+    const row = document.createElement('div');
+    row.className = 'roleRow';
+    row.innerHTML = `<span class="em">${ZODIAC_EMOJI[m.saju.day.branchIdx]}</span><div><div class="nm">${m.nickname}</div><div class="rl">${role}</div></div>`;
+    roleGrid.appendChild(row);
+  });
+  box.appendChild(roleGrid);
+
+  let pairCount = 0, scoreSum = 0;
+  const subSum = { idea:0, work:0, lunch:0, talk:0, peace:0 };
+  for (let i=0;i<list.length;i++) for (let j=i+1;j<list.length;j++) {
+    scoreSum += compatibilityScore(list[i], list[j]);
+    const s = subScores(list[i], list[j]);
+    Object.keys(subSum).forEach(k=> subSum[k]+=s[k]);
+    pairCount++;
+  }
+  const avgScore = Math.round(scoreSum / pairCount);
+  const scoreWrap = document.createElement('div');
+  scoreWrap.innerHTML = `<div class="scoreBig">${avgScore}</div><div class="scoreLabel">팀 밸런스</div>`;
+  box.appendChild(scoreWrap);
+
+  const card = document.createElement('div');
+  card.className = 'resultcard';
+  card.innerHTML = `<div class="rheadline">한 명이 말을 꺼내고, 한 명이 현실을 체크하고, 결국 누군가 정리합니다.</div>
+    <div class="rbody">역할이 자연스럽게 나뉘는 조합이라, 회의가 산으로 갈 확률이 낮습니다.</div>`;
+  box.appendChild(card);
+
+  const subgrid = document.createElement('div');
+  subgrid.className = 'subscoregrid';
+  const subDefs = [
+    { key:'idea', em:'💡', cap:'아이디어' }, { key:'work', em:'💼', cap:'실행' },
+    { key:'talk', em:'🗣', cap:'대화' }, { key:'lunch', em:'🍚', cap:'점심' },
+  ];
+  subDefs.forEach(d=>{
+    const val = Math.round(subSum[d.key]/pairCount);
+    const c = document.createElement('div'); c.className = 'subscorecard';
+    c.innerHTML = `<div class="em">${d.em}</div><div class="cap">${d.cap}</div><div class="val">${val}</div>`;
+    subgrid.appendChild(c);
+  });
+  box.appendChild(subgrid);
+
+  nextActionBar(box, [
+    { label:'점심 케미 보기', onClick: ()=> activatePlay('lunch') },
+    { label:'자리도 짜볼까?', onClick: ()=> activatePlay('seating') },
+  ]);
+}
+
+// ================= 결과 렌더링: 오늘 뭐 먹지? =================
+function renderLunchResult(box, list) {
+  const head = document.createElement('div');
+  head.className = 'resulthead';
+  head.innerHTML = `<h2>오늘 뭐 먹지?</h2><p class="lede">사주로 점심 메뉴를 맞춘다는 건 아니고, 그냥 성향 기반 가벼운 참고용입니다.</p>`;
+  box.appendChild(head);
+
+  const listWrap = document.createElement('div');
+  listWrap.className = 'lunchlist';
+  list.forEach(m=>{
+    const dom = strongestElem(m.counts);
+    const row = document.createElement('div'); row.className = 'lunchrow';
+    row.innerHTML = `<span class="em">${ZODIAC_EMOJI[m.saju.day.branchIdx]}</span><div><div class="nm">${m.nickname}</div><div class="tag">${FOOD_TYPE[dom]}</div></div>`;
+    listWrap.appendChild(row);
+  });
+  box.appendChild(listWrap);
+
+  const card = document.createElement('div');
+  card.className = 'resultcard';
+  if (list.length === 2) {
+    const domA = strongestElem(list[0].counts), domB = strongestElem(list[1].counts);
+    const val = subScores(list[0], list[1]).lunch;
+    const headline = domA === domB
+      ? `둘 다 ${FOOD_TYPE[domA]} 앞에서는 꽤 빠르게 합의합니다.`
+      : `${list[0].nickname}님은 ${FOOD_TYPE[domA]}, ${list[1].nickname}님은 ${FOOD_TYPE[domB]}. 메뉴판 앞에서 약간의 협상이 필요합니다.`;
+    card.innerHTML = `<div class="rheadline">${headline}</div><div class="rbody">점심 케미 ${val}점 — ${subLine(LUNCH_LINES, val)}</div>`;
+  } else {
+    const doms = list.map(m=>strongestElem(m.counts));
+    const uniq = new Set(doms).size;
+    const headline = uniq <= 2 ? '취향이 꽤 겹치는 팀이라 메뉴 결정이 빠릅니다.' : '취향이 다양한 팀이라 메뉴 정하는 데 약간의 토론이 필요할 수 있습니다.';
+    card.innerHTML = `<div class="rheadline">${headline}</div><div class="rbody">그래도 결국 다 같이 맛있게 먹습니다.</div>`;
+  }
+  box.appendChild(card);
+
+  nextActionBar(box, [
+    { label:'럭키템 보기', onClick: ()=> activatePlay('recharge') },
+    { label:'그룹 케미 보기', onClick: ()=> activatePlay('chemi') },
+  ]);
+}
+
+// ================= 결과 렌더링: 오행 충전소 =================
+function renderRechargeResult(box, list) {
+  const head = document.createElement('div');
+  head.className = 'resulthead';
+  head.innerHTML = `<h2>오행 충전소</h2><p class="lede">부족한 오행을 채워주는 가벼운 데스크템 추천입니다.</p>`;
+  box.appendChild(head);
+
+  if (list.length === 1) {
+    const m = list[0];
+    const weak = weakestElem(m.counts);
+    const li = LUCKY_ITEMS[weak];
+    const card = document.createElement('div'); card.className = 'luckycard';
+    card.innerHTML = `<div class="needchips"><span class="luckychip" style="background:${ELEM_BG[weak]};color:${ELEM_COLOR[weak]}">${ELEM_EMOJI[weak]} ${weak} 부족</span></div>
+      <div class="itemname">${li.item}</div><div class="itemcopy">${li.copy}</div>`;
+    box.appendChild(card);
+  } else if (list.length === 2) {
+    const weakA = weakestElem(list[0].counts), weakB = weakestElem(list[1].counts);
+    const key = comboKey(weakA, weakB);
+    const combo = COMBO_ITEMS[key];
+    const card = document.createElement('div'); card.className = 'luckycard';
+    if (combo) {
+      card.innerHTML = `<div class="needchips">
+          <span class="luckychip" style="background:${ELEM_BG[weakA]};color:${ELEM_COLOR[weakA]}">${ELEM_EMOJI[weakA]} ${list[0].nickname} · ${weakA} 부족</span>
+          <span class="luckychip" style="background:${ELEM_BG[weakB]};color:${ELEM_COLOR[weakB]}">${ELEM_EMOJI[weakB]} ${list[1].nickname} · ${weakB} 부족</span>
+        </div>
+        <div class="itemname">${combo.item}</div><div class="itemcopy">${combo.copy}</div>`;
+    } else {
+      const liA = LUCKY_ITEMS[weakA], liB = LUCKY_ITEMS[weakB];
+      card.innerHTML = `<div class="itemname">${liA.item} & ${liB.item}</div>
+        <div class="itemcopy">${list[0].nickname}님에게는 ${liA.item}, ${list[1].nickname}님에게는 ${liB.item}. 하나씩 나눠 가져도, 책상에 나란히 둬도 괜찮습니다.</div>`;
+    }
+    box.appendChild(card);
+  } else {
+    list.forEach(m=>{
+      const weak = weakestElem(m.counts);
+      const li = LUCKY_ITEMS[weak];
+      const card = document.createElement('div'); card.className = 'luckycard'; card.style.marginBottom = '16px';
+      card.innerHTML = `<div class="needchips"><span class="luckychip" style="background:${ELEM_BG[weak]};color:${ELEM_COLOR[weak]}">${ZODIAC_EMOJI[m.saju.day.branchIdx]} ${m.nickname} · ${weak} 부족</span></div>
+        <div class="itemname">${li.item}</div><div class="itemcopy">${li.copy}</div>`;
+      box.appendChild(card);
+    });
+  }
+
+  nextActionBar(box, [
+    { label:'그룹 케미 보기', onClick: ()=> activatePlay('chemi') },
+    { label:'자리도 짜볼까?', onClick: ()=> activatePlay('seating') },
+  ]);
+}
+</script>
+</body>
+</html>
