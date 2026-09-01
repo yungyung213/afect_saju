@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MY SAJU</title>
+<style>
+  :root{
+    --paper:#F6F2EA;
+    --card:#FFFDF8;
+    --ink:#221F1A;
+    --ink-soft:#6B655B;
+    --ink-faint:#A39C8E;
+    --line:rgba(34,31,26,0.13);
+    --accent:#3E3856;
+    --accent-soft:#ECE9F3;
+    --wood:#2FA84F; --wood-bg:#DFF3E3;
+    --fire:#FF4136; --fire-bg:#FFE1DE;
+    --earth:#E0A526; --earth-bg:#FBEECB;
+    --metal:#7B61FF; --metal-bg:#E9E3FF;
+    --water:#0074D9; --water-bg:#DCEBFA;
+    --radius-lg:20px;
+    --radius-md:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:480px;
+    margin:0 auto;
+    padding:36px 20px 64px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .brand .mark{
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:0.14em;
+    color:var(--ink);
+  }
+  .brand .sub{
+    font-size:12px;
+    color:var(--ink-faint);
+  }
+
+  /* ---- Onboarding ---- */
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:28px 24px;
+  }
+  .panel h1{
+    font-size:22px;
+    font-weight:700;
+    line-height:1.4;
+    margin:0 0 6px;
+  }
+  .panel .lede{
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    margin:0 0 24px;
+  }
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+  }
+  .field input[type="text"],
+  .field input[type="date"],
+  .field input[type="time"]{
+    width:100%;
+    padding:11px 13px;
+    font-size:15px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--ink);
+    font-family:inherit;
+  }
+  .field input:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .row2{ display:flex; gap:10px; }
+  .row2 > div{ flex:1; }
+  .chiprow{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    padding:9px 15px;
+    font-size:13px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+  }
+  .chip.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .chip.disabled{
+    opacity:0.45;
+    cursor:not-allowed;
+  }
+  .field select{
+    width:100%;
+    padding:11px 13px;
+    font-size:15px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--ink);
+    font-family:inherit;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B655B' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:16px;
+  }
+  .field select:disabled{
+    opacity:0.45;
+    background-color:var(--paper);
+  }
+  .field select:focus{ outline:none; border-color:var(--accent); }
+  .hint{ font-size:12px; color:var(--ink-faint); margin-top:6px; line-height:1.5; }
+  .unknown-time{
+    display:flex; align-items:center; gap:7px;
+    font-size:12px; color:var(--ink-soft);
+    margin-top:8px; cursor:pointer;
+  }
+  .unknown-time input{ margin:0; }
+  .err{ font-size:12px; color:var(--fire); margin-top:6px; display:none; }
+
+  .cta{
+    width:100%;
+    padding:14px;
+    margin-top:6px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .cta:active{ transform:scale(0.99); }
+  .ghost-btn{
+    width:100%;
+    padding:12px;
+    background:transparent;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:14px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    margin-top:10px;
+  }
+
+  /* ---- Loading ---- */
+  #loading{ display:none; text-align:center; padding:70px 10px; }
+  #loading .spin{
+    width:34px; height:34px; margin:0 auto 20px;
+    border:3px solid var(--line);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  #loading p{ font-size:14px; color:var(--ink-soft); margin:0; min-height:20px; }
+
+  /* ---- Result ---- */
+  #result{ display:none; }
+
+  .hero{
+    position:relative;
+    background:var(--accent);
+    color:#fff;
+    border-radius:var(--radius-lg);
+    padding:26px 22px 22px;
+    overflow:hidden;
+  }
+  .hero .nick{
+    font-size:12px;
+    letter-spacing:0.06em;
+    color:rgba(255,255,255,0.65);
+    margin-bottom:10px;
+  }
+  .hero .stamp{
+    display:inline-block;
+    font-size:11px;
+    color:rgba(255,255,255,0.8);
+    border:1px solid rgba(255,255,255,0.35);
+    padding:4px 9px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  .hero h2{
+    font-size:22px;
+    line-height:1.5;
+    font-weight:700;
+    margin:0 0 14px;
+  }
+  .hero p{
+    font-size:14px;
+    line-height:1.7;
+    color:rgba(255,255,255,0.88);
+    margin:0;
+  }
+
+  .section-label{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-faint);
+    letter-spacing:0.04em;
+    margin:28px 0 10px;
+  }
+
+  .sajutable{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    table-layout:fixed;
+    font-size:12.5px;
+  }
+  .sajutable th, .sajutable td{
+    border:1px solid var(--line);
+    padding:8px 3px;
+    text-align:center;
+    vertical-align:middle;
+  }
+  .sajutable th{
+    background:var(--paper);
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+  .sajutable td.rowlabel, .sajutable th.corner{
+    background:var(--paper);
+    font-size:11px;
+    color:var(--ink-faint);
+    font-weight:700;
+    width:44px;
+  }
+  .sajutable td.daycol, .sajutable th.daycol{ background:var(--accent-soft); }
+  .sajutable .glyph{ font-size:20px; font-weight:700; line-height:1.2; }
+  .sajutable .glyph-sub{ font-size:10px; color:var(--ink-faint); margin-top:2px; }
+  .sajutable .emoji{ font-size:15px; }
+  .sajutable .sipsung{ font-size:11.5px; color:var(--ink-soft); }
+  .sajutable .hidden-stems{ font-size:12px; letter-spacing:1px; }
+  .sajutable .stage, .sajutable .sinsal{ font-size:11.5px; }
+  .sajutable tr.daymaster-row td{ font-weight:700; }
+
+  .elements{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:18px 16px;
+  }
+  .ebar{ display:flex; height:14px; border-radius:999px; overflow:hidden; margin-bottom:12px; }
+  .ebar span{ height:100%; }
+  .elegend{ display:flex; flex-wrap:wrap; gap:10px 16px; }
+  .elegend .item{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-soft); }
+  .elegend .dot{ width:9px; height:9px; border-radius:50%; }
+
+  .accordion{
+    margin-top:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    overflow:hidden;
+  }
+  .accordion summary{
+    padding:15px 16px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .accordion summary::-webkit-details-marker{ display:none; }
+  .accordion summary .arrow{ transition:transform 0.15s; color:var(--ink-faint); }
+  .accordion[open] summary .arrow{ transform:rotate(180deg); }
+  .accordion .body{
+    padding:0 16px 18px;
+    font-size:13px;
+    line-height:1.8;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .accordion .body .basisrow{ margin-bottom:6px; }
+  .accordion .body .basisrow b{ color:var(--ink); }
+
+  .actions{ display:flex; gap:8px; margin-top:20px; }
+  .actions button{
+    flex:1;
+    padding:12px;
+    font-size:13px;
+    font-weight:700;
+    font-family:inherit;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .actions .regen{
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--ink);
+  }
+  .actions .restart{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+
+  .note{
+    margin-top:24px;
+    padding:13px 14px;
+    background:transparent;
+    border:1px dashed var(--line);
+    border-radius:12px;
+    font-size:11.5px;
+    line-height:1.7;
+    color:var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="mark">A.FECT SAJU</div>
+    <div class="sub">MY SAJU · 프로토타입</div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div class="panel" id="onboarding">
+    <h1>당신의 사주,<br>한 줄로 먼저 볼까요?</h1>
+    <p class="lede">기본 정보만 입력하면 사주 프로필과 한 줄 요약을 바로 보여드립니다.</p>
+
+    <div class="field">
+      <label for="nickname">닉네임</label>
+      <input type="text" id="nickname" placeholder="예: 점머씨">
+    </div>
+
+    <div class="field">
+      <label for="bdate">생년월일</label>
+      <input type="date" id="bdate">
+    </div>
+
+    <div class="field">
+      <label for="hourSelect">태어난 시각 (시주)</label>
+      <select id="hourSelect">
+        <option value="" disabled selected>시간을 선택해 주세요</option>
+      </select>
+    </div>
+    <label class="unknown-time">
+      <input type="checkbox" id="timeUnknown"> 태어난 시각을 몰라요 (시주 제외하고 계산)
+    </label>
+
+    <div class="field" style="margin-top:18px;">
+      <label>양력 / 음력</label>
+      <div class="chiprow">
+        <div class="chip active" data-cal="solar">양력</div>
+        <div class="chip disabled" title="다음 단계에서 지원 예정">음력 (준비 중)</div>
+      </div>
+      <div class="hint">MVP 프로토타입은 양력 입력만 지원합니다. 음력 변환은 정밀한 삭망 계산이 필요해 다음 단계에서 추가할 예정입니다.</div>
+    </div>
+
+    <div class="field">
+      <label>성별</label>
+      <div class="chiprow">
+        <div class="chip active" data-gender="f">여성</div>
+        <div class="chip" data-gender="m">남성</div>
+      </div>
+    </div>
+
+    <div class="err" id="formErr">생년월일을 입력해 주세요.</div>
+    <button class="cta" id="submitBtn">사주 계산하기</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spin"></div>
+    <p id="loadingText">사주 여덟 글자를 맞춰보는 중...</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <div class="hero">
+      <div class="nick" id="rNick"></div>
+      <div class="stamp" id="rDayMaster">일간</div>
+      <h2 id="rTitle">잠깐, 그래서 결론은?</h2>
+      <p id="rSummary"></p>
+    </div>
+
+    <div class="section-label">사주 프로필</div>
+    <div style="overflow-x:auto;">
+      <table class="sajutable" id="rPillars"></table>
+    </div>
+    <div class="hint" style="margin-top:8px;">일주(생일) 칸이 나를 나타내는 일간입니다. 십성 · 12운성 · 12신살은 일간을 기준으로 계산됩니다.</div>
+
+    <div class="section-label">오행 밸런스</div>
+    <div class="elements">
+      <div class="ebar" id="rEbar"></div>
+      <div class="elegend" id="rElegend"></div>
+    </div>
+
+    <details class="accordion">
+      <summary>자세히 보기 <span class="arrow">⌄</span></summary>
+      <div class="body" id="rDetail"></div>
+    </details>
+
+    <div class="actions">
+      <button class="regen" id="regenBtn">다른 표현 보기</button>
+      <button class="restart" id="restartBtn">다시 시작</button>
+    </div>
+
+    <div class="note">
+      절기 경계는 태양 황경 계산(저정밀 천문 공식)으로 산출한 근사치이며, 공식 만세력과 대조 후 정식 서비스에 반영하는 것을 권장합니다. 이 프로토타입의 해석 문구는 Gemini 연동 전 미리보기용으로 Claude를 사용해 생성했습니다 — 실제 서비스는 기획서(4장)에 따라 서버사이드 Gemini 키로 교체됩니다.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ================= Saju calculation engine =================
+// Verified against 한국민족문화대백과사전 reference example:
+// 1911-08-25 18:00 -> 신해년 병신월 정묘일 기유시 (encykorea.aks.ac.kr/Article/E0025957)
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const STEM_ELEM = ['목','목','화','화','토','토','금','금','수','수'];
+const BRANCH_ELEM = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+const ELEM_KEY = {'목':'wood','화':'fire','토':'earth','금':'metal','수':'water'};
+const ELEM_LABEL = {'목':'목(나무)','화':'화(불)','토':'토(흙)','금':'금(쇠)','수':'수(물)'};
+const STEM_YINYANG = ['양','음','양','음','양','음','양','음','양','음'];
+const ZODIAC_EMOJI = ['🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐑','🐵','🐔','🐶','🐷'];
+
+// 지지의 본기(本氣, 대표 지장간) — 지지 자체의 오행/음양 표시 및 지지 십성 계산에 사용.
+// 검증: 한국민족문화대백과사전 예시(1911-08-25 18:00)를 포함해 포스텔러류 만세력 표기와 대조 완료.
+const BRANCH_PRIMARY_STEM = [9,5,0,1,4,2,3,5,6,7,4,8]; // 자축인묘진사오미신유술해 -> 본기 천간 index
+
+// 지장간(여기·중기·정기) — 연해자평 기준 통용표. 사(巳)=무경병, 미(未)=정을기, 묘(卯)=갑을, 술(戌)=신정무로
+// 사용자가 첨부한 참고 만세력 캡처(포스텔러)와 4칸 모두 대조하여 검증함.
+const HIDDEN_STEMS = [
+  [8,9],       // 자: 임계
+  [9,7,5],     // 축: 계신기
+  [4,2,0],     // 인: 무병갑
+  [0,1],       // 묘: 갑을
+  [1,9,4],     // 진: 을계무
+  [4,6,2],     // 사: 무경병
+  [2,5,3],     // 오: 병기정
+  [3,1,5],     // 미: 정을기
+  [4,8,6],     // 신: 무임경
+  [6,7],       // 유: 경신
+  [7,3,4],     // 술: 신정무
+  [4,0,8],     // 해: 무갑임
+];
+
+// 12운성(포태법) — 각 천간의 장생 지지, 양간은 순행/음간은 역행.
+const SAENG_BRANCH = [11,6,2,9,2,9,5,0,8,3]; // 갑을병정무기경신임계
+const STAGE12 = ['장생','목욕','관대','건록','제왕','쇠','병','사','묘','절','태','양'];
+
+// 12신살 — 년지의 삼합 그룹을 기준으로 겁살 시작점을 정하고 순행.
+// 인오술(화국) 겁살=해 / 신자진(수국) 겁살=사 / 사유축(금국) 겁살=인 / 해묘미(목국) 겁살=신
+const TRIAD_GROUPS = [
+  { members:[2,6,10], gapsal:11 },
+  { members:[8,0,4], gapsal:5 },
+  { members:[5,9,1], gapsal:2 },
+  { members:[11,3,7], gapsal:8 },
+];
+const SINSAL12 = ['겁살','재살','천살','지살','년살','월살','망신살','장성살','반안살','역마살','육해살','화개살'];
+
+const GENERATES = {'목':'화','화':'토','토':'금','금':'수','수':'목'};
+const CONTROLS = {'목':'토','토':'수','수':'화','화':'금','금':'목'};
+
+function getSipsung(dayStemIdx, otherStemIdx) {
+  const dayElem = STEM_ELEM[dayStemIdx], otherElem = STEM_ELEM[otherStemIdx];
+  const sameYY = (dayStemIdx % 2) === (otherStemIdx % 2);
+  if (otherElem === dayElem) return sameYY ? '비견' : '겁재';
+  if (GENERATES[dayElem] === otherElem) return sameYY ? '식신' : '상관';
+  if (CONTROLS[dayElem] === otherElem) return sameYY ? '편재' : '정재';
+  if (CONTROLS[otherElem] === dayElem) return sameYY ? '편관' : '정관';
+  if (GENERATES[otherElem] === dayElem) return sameYY ? '편인' : '정인';
+  return '-';
+}
+function getStage(dayStemIdx, targetBranchIdx) {
+  const saeng = SAENG_BRANCH[dayStemIdx];
+  const isYang = dayStemIdx % 2 === 0;
+  const offset = isYang ? ((targetBranchIdx - saeng + 12) % 12) : ((saeng - targetBranchIdx + 12) % 12);
+  return STAGE12[offset];
+}
+function getSinsal(yearBranchIdx, targetBranchIdx) {
+  const group = TRIAD_GROUPS.find(g => g.members.includes(yearBranchIdx));
+  const offset = (targetBranchIdx - group.gapsal + 12) % 12;
+  return SINSAL12[offset];
+}
+
+function jdn(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12 * a - 3;
+  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+}
+function dayPillar(y, m, d) {
+  const j = jdn(y, m, d);
+  return { stemIdx: (j + 9) % 10, branchIdx: (j + 1) % 12 };
+}
+function toJulianDay(y, m, d, hourFrac) {
+  return jdn(y, m, d) - 0.5 + hourFrac / 24;
+}
+function solarLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  const Mrad = M * Math.PI / 180;
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad)
+          + 0.000289 * Math.sin(3 * Mrad);
+  let lon = (L0 + C) % 360;
+  if (lon < 0) lon += 360;
+  return lon;
+}
+function findSolarTermJD(year, approxMonth, targetDeg) {
+  let lo = jdn(year, approxMonth, 1) - 20;
+  let hi = jdn(year, approxMonth, 1) + 45;
+  function angDiff(jd) {
+    let diff = solarLongitude(jd) - targetDeg;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    return diff;
+  }
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (angDiff(mid) < 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+function yearPillar(effectiveYear) {
+  let diff = effectiveYear - 1984;
+  return { stemIdx: ((diff % 10) + 10) % 10, branchIdx: ((diff % 12) + 12) % 12 };
+}
+const MONTH_TERMS = [
+  { deg: 315, branch: 2, approxMonth: 2 },{ deg: 345, branch: 3, approxMonth: 3 },
+  { deg: 15, branch: 4, approxMonth: 4 },{ deg: 45, branch: 5, approxMonth: 5 },
+  { deg: 75, branch: 6, approxMonth: 6 },{ deg: 105, branch: 7, approxMonth: 7 },
+  { deg: 135, branch: 8, approxMonth: 8 },{ deg: 165, branch: 9, approxMonth: 9 },
+  { deg: 195, branch: 10, approxMonth: 10 },{ deg: 225, branch: 11, approxMonth: 11 },
+  { deg: 255, branch: 0, approxMonth: 12 },{ deg: 285, branch: 1, approxMonth: 1 },
+];
+function getEffectiveYearAndMonthBranch(y, m, d, hourFrac) {
+  const birthJD = toJulianDay(y, m, d, hourFrac);
+  const termJDs = MONTH_TERMS.map(t => ({...t, jd: findSolarTermJD(y, t.approxMonth, t.deg)}));
+  const sorted = [...termJDs].sort((a,b) => a.jd - b.jd);
+  let monthBranch = null;
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    if (birthJD >= sorted[i].jd) { monthBranch = sorted[i].branch; break; }
+  }
+  if (monthBranch === null) {
+    const prevTerms = [
+      { deg: 255, branch: 0, approxMonth: 12 },{ deg: 285, branch: 1, approxMonth: 1 },
+    ].map(t => ({...t, jd: findSolarTermJD(y - 1, t.approxMonth, t.deg)}));
+    const sortedPrev = prevTerms.sort((a,b)=>a.jd-b.jd);
+    for (let i = sortedPrev.length -1; i>=0; i--) {
+      if (birthJD >= sortedPrev[i].jd) { monthBranch = sortedPrev[i].branch; break; }
+    }
+  }
+  const ipchunJD = findSolarTermJD(y, 2, 315);
+  const effectiveYear = birthJD >= ipchunJD ? y : y - 1;
+  return { effectiveYear, monthBranch };
+}
+const WOHO = { 0:2,5:2, 1:4,6:4, 2:6,7:6, 3:8,8:8, 4:0,9:0 };
+function monthPillar(yearStemIdx, monthBranchIdx) {
+  const inMonthStem = WOHO[yearStemIdx];
+  const offset = ((monthBranchIdx - 2) + 12) % 12;
+  return { stemIdx: (inMonthStem + offset) % 10, branchIdx: monthBranchIdx };
+}
+const OSEO = { 0:0,5:0, 1:2,6:2, 2:4,7:4, 3:6,8:6, 4:8,9:8 };
+function hourPillar(dayStemIdx, branchIdx) {
+  const ziStem = OSEO[dayStemIdx];
+  return { stemIdx: (ziStem + branchIdx) % 10, branchIdx };
+}
+// 12 traditional two-hour blocks (시주). representativeHour is only used to place the
+// birth moment for month/year 절기 boundary lookups (day-level precision is enough there).
+const HOUR_BRANCHES = [
+  { branchIdx:0,  name:'자시', range:'23:00~01:00', representativeHour:0 },
+  { branchIdx:1,  name:'축시', range:'01:00~03:00', representativeHour:2 },
+  { branchIdx:2,  name:'인시', range:'03:00~05:00', representativeHour:4 },
+  { branchIdx:3,  name:'묘시', range:'05:00~07:00', representativeHour:6 },
+  { branchIdx:4,  name:'진시', range:'07:00~09:00', representativeHour:8 },
+  { branchIdx:5,  name:'사시', range:'09:00~11:00', representativeHour:10 },
+  { branchIdx:6,  name:'오시', range:'11:00~13:00', representativeHour:12 },
+  { branchIdx:7,  name:'미시', range:'13:00~15:00', representativeHour:14 },
+  { branchIdx:8,  name:'신시', range:'15:00~17:00', representativeHour:16 },
+  { branchIdx:9,  name:'유시', range:'17:00~19:00', representativeHour:18 },
+  { branchIdx:10, name:'술시', range:'19:00~21:00', representativeHour:20 },
+  { branchIdx:11, name:'해시', range:'21:00~23:00', representativeHour:22 },
+];
+function fullSaju(y, m, d, hourBranchIdx, hasTime) {
+  const representativeHour = hasTime
+    ? HOUR_BRANCHES.find(h => h.branchIdx === hourBranchIdx).representativeHour
+    : 12; // noon fallback when time is unknown; only affects month/year term lookup at day-level precision
+  const day = dayPillar(y, m, d);
+  const { effectiveYear, monthBranch } = getEffectiveYearAndMonthBranch(y, m, d, representativeHour);
+  const year = yearPillar(effectiveYear);
+  const month = monthPillar(year.stemIdx, monthBranch);
+  const hourP = hasTime ? hourPillar(day.stemIdx, hourBranchIdx) : null;
+  return { year, month, day, hour: hourP };
+}
+function fmt(p){ return p ? STEMS[p.stemIdx] + BRANCHES[p.branchIdx] : '모름'; }
+
+function fiveElementCounts(saju) {
+  const counts = { wood:0, fire:0, earth:0, metal:0, water:0 };
+  const parts = [saju.year, saju.month, saju.day, saju.hour].filter(Boolean);
+  parts.forEach(p => {
+    counts[ELEM_KEY[STEM_ELEM[p.stemIdx]]]++;
+    counts[ELEM_KEY[BRANCH_ELEM[p.branchIdx]]]++;
+  });
+  return counts;
+}
+
+// ================= UI wiring =================
+const onboarding = document.getElementById('onboarding');
+const loadingEl = document.getElementById('loading');
+const resultEl = document.getElementById('result');
+
+document.querySelectorAll('.chip[data-gender]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip[data-gender]').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+  });
+});
+
+const hourSelectEl = document.getElementById('hourSelect');
+HOUR_BRANCHES.forEach(h=>{
+  const opt = document.createElement('option');
+  opt.value = h.branchIdx;
+  opt.textContent = `${h.name} (${h.range})`;
+  hourSelectEl.appendChild(opt);
+});
+document.getElementById('timeUnknown').addEventListener('change', (e)=>{
+  hourSelectEl.disabled = e.target.checked;
+  if (e.target.checked) hourSelectEl.value = '';
+});
+
+const loadingLines = [
+  '사주 여덟 글자를 맞춰보는 중...',
+  '오행 밸런스를 확인하는 중...',
+  '겉으로 보이는 나와 실제 나를 대조하는 중...',
+  '좋아요. 이제 꽤 많은 걸 알아냈습니다.'
+];
+
+let lastSaju = null, lastNick = '';
+
+document.getElementById('submitBtn').addEventListener('click', async ()=>{
+  const nickname = document.getElementById('nickname').value.trim() || '멤버';
+  const bdate = document.getElementById('bdate').value;
+  const timeUnknown = document.getElementById('timeUnknown').checked;
+  const selectedHour = hourSelectEl.value;
+  const errEl = document.getElementById('formErr');
+
+  if (!bdate) { errEl.textContent = '생년월일을 입력해 주세요.'; errEl.style.display = 'block'; return; }
+  if (!timeUnknown && selectedHour === '') { errEl.textContent = '태어난 시각(시주)을 선택하거나, 모른다면 아래 체크박스를 선택해 주세요.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const [y,m,d] = bdate.split('-').map(Number);
+  const hasTime = !timeUnknown;
+  const hourBranchIdx = hasTime ? Number(selectedHour) : null;
+
+  const saju = fullSaju(y, m, d, hourBranchIdx, hasTime);
+  lastSaju = saju; lastNick = nickname;
+
+  onboarding.style.display = 'none';
+  loadingEl.style.display = 'block';
+  let li = 0;
+  const loadingText = document.getElementById('loadingText');
+  const timer = setInterval(()=>{ li = (li+1) % loadingLines.length; loadingText.textContent = loadingLines[li]; }, 700);
+
+  const interp = await generateInterpretation(saju, nickname);
+
+  clearInterval(timer);
+  loadingEl.style.display = 'none';
+  renderResult(saju, nickname, interp);
+});
+
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  resultEl.style.display = 'none';
+  onboarding.style.display = 'block';
+});
+document.getElementById('regenBtn').addEventListener('click', async ()=>{
+  if (!lastSaju) return;
+  const btn = document.getElementById('regenBtn');
+  btn.textContent = '다시 해석하는 중...';
+  btn.disabled = true;
+  const interp = await generateInterpretation(lastSaju, lastNick, true);
+  renderResult(lastSaju, lastNick, interp);
+  btn.textContent = '다른 표현 보기';
+  btn.disabled = false;
+});
+
+function renderResult(saju, nickname, interp) {
+  document.getElementById('rNick').textContent = nickname + '님의 사주';
+  document.getElementById('rTitle').textContent = interp.title;
+  document.getElementById('rSummary').textContent = interp.summary;
+  document.getElementById('rDayMaster').textContent =
+    '일주 · ' + STEMS[saju.day.stemIdx] + BRANCHES[saju.day.branchIdx] + ' ' + ZODIAC_EMOJI[saju.day.branchIdx];
+
+  const dayStemIdx = saju.day.stemIdx;
+  const yearBranchIdx = saju.year.branchIdx;
+  const cols = [
+    {label:'생시', p: saju.hour},
+    {label:'생일', p: saju.day},
+    {label:'생월', p: saju.month},
+    {label:'생년', p: saju.year},
+  ];
+  function stemCell(p) {
+    if (!p) return {glyph:'-', sub:'', sipsung:'-'};
+    const yy = STEM_YINYANG[p.stemIdx] === '양' ? '+' : '-';
+    return { glyph: STEMS[p.stemIdx], sub: yy + STEM_ELEM[p.stemIdx], sipsung: getSipsung(dayStemIdx, p.stemIdx) };
+  }
+  function branchCell(p) {
+    if (!p) return {glyph:'-', sub:'', emoji:'', sipsung:'-', hidden:'-', stage:'-', sinsal:'-'};
+    const primary = BRANCH_PRIMARY_STEM[p.branchIdx];
+    const yy = STEM_YINYANG[primary] === '양' ? '+' : '-';
+    return {
+      glyph: BRANCHES[p.branchIdx],
+      sub: yy + STEM_ELEM[primary],
+      emoji: ZODIAC_EMOJI[p.branchIdx],
+      sipsung: getSipsung(dayStemIdx, primary),
+      hidden: HIDDEN_STEMS[p.branchIdx].map(si=>STEMS[si]).join(''),
+      stage: getStage(dayStemIdx, p.branchIdx),
+      sinsal: getSinsal(yearBranchIdx, p.branchIdx)
+    };
+  }
+  const stemCells = cols.map(c=>stemCell(c.p));
+  const branchCells = cols.map(c=>branchCell(c.p));
+  const td = (content, isDay) => `<td${isDay?' class="daycol"':''}>${content}</td>`;
+
+  document.getElementById('rPillars').innerHTML = `
+    <tr>
+      <th class="corner"></th>
+      ${cols.map(c=>`<th${c.label==='생일'?' class="daycol"':''}>${c.label}</th>`).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">천간</td>
+      ${cols.map((c,i)=>td(`<div class="glyph">${stemCells[i].glyph}</div><div class="glyph-sub">${stemCells[i].sub}</div>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">십성</td>
+      ${cols.map((c,i)=>td(`<span class="sipsung">${stemCells[i].sipsung}</span>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">지지</td>
+      ${cols.map((c,i)=>td(`<div class="glyph">${branchCells[i].glyph} <span class="emoji">${branchCells[i].emoji}</span></div><div class="glyph-sub">${branchCells[i].sub}</div>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">십성</td>
+      ${cols.map((c,i)=>td(`<span class="sipsung">${branchCells[i].sipsung}</span>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">지장간</td>
+      ${cols.map((c,i)=>td(`<span class="hidden-stems">${branchCells[i].hidden}</span>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">12운성</td>
+      ${cols.map((c,i)=>td(`<span class="stage">${branchCells[i].stage}</span>`, c.label==='생일')).join('')}
+    </tr>
+    <tr>
+      <td class="rowlabel">12신살</td>
+      ${cols.map((c,i)=>td(`<span class="sinsal">${branchCells[i].sinsal}</span>`, c.label==='생일')).join('')}
+    </tr>
+  `;
+
+  const counts = fiveElementCounts(saju);
+  const total = Object.values(counts).reduce((a,b)=>a+b,0) || 1;
+  const barColors = { wood:'var(--wood)', fire:'var(--fire)', earth:'var(--earth)', metal:'var(--metal)', water:'var(--water)' };
+  const order2 = ['wood','fire','earth','metal','water'];
+  document.getElementById('rEbar').innerHTML = order2.map(k=>{
+    const pct = (counts[k]/total*100).toFixed(1);
+    return counts[k] > 0 ? `<span style="width:${pct}%;background:${barColors[k]}"></span>` : '';
+  }).join('');
+  const nameMap = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
+  document.getElementById('rElegend').innerHTML = order2.map(k=>{
+    return `<div class="item"><span class="dot" style="background:${barColors[k]}"></span>${ELEM_LABEL[nameMap[k]]} ${counts[k]}</div>`;
+  }).join('');
+
+  document.getElementById('rDetail').innerHTML =
+    `<div class="basisrow"><b>사용된 근거</b></div>` +
+    interp.basis.map(b=>`<div class="basisrow">· ${b}</div>`).join('') +
+    `<div class="basisrow" style="margin-top:10px;"><b>상세 설명</b></div>` +
+    `<div>${interp.detail}</div>`;
+
+  onboarding.style.display = 'none';
+  loadingEl.style.display = 'none';
+  resultEl.style.display = 'block';
+}
+
+// ================= AI interpretation (Claude standing in for the Gemini server call) =================
+function localFallback(saju, nickname) {
+  const dayElem = STEM_ELEM[saju.day.stemIdx];
+  const map = {
+    '목':{title:'일단 심어놓고 보는 사람', summary:'생각이 서면 몸이 먼저 움직입니다. 방향만 맞으면 속도는 알아서 붙는 타입.'},
+    '화':{title:'회의실 온도를 올리는 사람', summary:'조용히 있다가도 꽂히는 주제가 나오면 목소리 톤이 한 단계 올라갑니다.'},
+    '토':{title:'말은 잘 들어드립니다. 반영 여부는 별도 협의입니다.', summary:'겉으로는 유연해 보여도 내부 기준선은 꽤 확고한 편입니다.'},
+    '금':{title:'정리가 끝나야 마음이 놓이는 사람', summary:'느슨한 상태를 오래 못 견딥니다. 마감이 다가올수록 오히려 차분해집니다.'},
+    '수':{title:'멀리 보고 조용히 움직이는 사람', summary:'급한 티는 안 내지만 결국 필요한 곳에 정확히 가 있습니다.'}
+  };
+  const pick = map[dayElem] || map['토'];
+  return {
+    title: pick.title,
+    summary: pick.summary,
+    detail: '일간(' + STEMS[saju.day.stemIdx] + STEM_ELEM[saju.day.stemIdx] + ')을 기준으로 생성된 미리보기 문구입니다. 네트워크 연결이 없어 로컬 템플릿으로 대체되었습니다.',
+    basis: ['일간: ' + STEMS[saju.day.stemIdx] + STEM_ELEM[saju.day.stemIdx]]
+  };
+}
+
+async function generateInterpretation(saju, nickname, regenerate) {
+  const sajuSummary = {
+    year: fmt(saju.year), month: fmt(saju.month), day: fmt(saju.day), hour: fmt(saju.hour),
+    day_master: STEMS[saju.day.stemIdx] + STEM_ELEM[saju.day.stemIdx] + '(' + STEM_YINYANG[saju.day.stemIdx] + ')',
+    five_elements: fiveElementCounts(saju)
+  };
+
+  const prompt = `당신은 사내 사주 콘텐츠 앱의 카피라이터입니다. 아래 사주 데이터를 바탕으로 재치있고 공감가는 한 줄 해석을 만드세요.
+
+사주 데이터: ${JSON.stringify(sajuSummary)}
+
+규칙:
+- 어조 비율: 공감가는 관찰 60%, 명료한 설명 25%, 위트 15%
+- 절대 부정적으로 단정하거나 "나쁘다/못하다" 식으로 낙인찍지 말 것. 놀리듯 하되 다정할 것.
+- 사주 지식이 없는 사람도 바로 이해되게 쓸 것. 전문용어(십성, 지장간 등) 남발 금지.
+- title: 12~20자 내외의 임팩트있는 한 줄 헤드라인
+- summary: 2~3문장, 구체적인 직장/일상 행동 묘사 포함
+- detail: 자세히 보기에서 보여줄 3~4문장, 어떤 사주 요소(일간, 오행 밸런스 등)에서 이 해석이 나왔는지 담백하게 설명
+- basis: 이 해석의 근거가 된 사주 요소 1~3개를 짧은 문자열 배열로
+${regenerate ? '- 이전과는 다른 각도의 표현으로 새로 써줄 것' : ''}
+
+아래 JSON 형식으로만 응답하세요. 다른 텍스트, 코드펜스 없이 JSON만 출력:
+{"title":"","summary":"","detail":"","basis":[]}`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    if (!textBlock) throw new Error('no text block');
+    const clean = textBlock.text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    if (!parsed.title || !parsed.summary) throw new Error('incomplete response');
+    if (!parsed.basis) parsed.basis = ['일간: ' + sajuSummary.day_master];
+    return parsed;
+  } catch (e) {
+    return localFallback(saju, nickname);
+  }
+}
+</script>
+</body>
+</html>
