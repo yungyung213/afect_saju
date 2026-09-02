@@ -22,6 +22,16 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
+// GitHub Pages(다른 도메인)에서 이 서버로 보내는 요청을 브라우저가 막지 않도록 허용합니다.
+// 필요하면 '*' 대신 실제 프론트 주소만 허용하도록 좁힐 수 있습니다.
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = 'gemini-2.0-flash'; // 필요에 따라 다른 Gemini 모델로 교체 가능
 
