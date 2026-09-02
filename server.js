@@ -69,7 +69,7 @@ ${JSON.stringify(facts)}
         body: JSON.stringify({
           system_instruction: { parts: [{ text: system_prompt || '' }] },
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: { temperature: 0.9, maxOutputTokens: 800 },
+          generationConfig: { temperature: 0.9, maxOutputTokens: 2048 },
         }),
       }
     );
@@ -90,7 +90,8 @@ ${JSON.stringify(facts)}
     try {
       parsed = JSON.parse(cleaned);
     } catch (e) {
-      console.error('[Gemini response parse error]', rawText);
+      const finishReason = geminiData?.candidates?.[0]?.finishReason;
+      console.error('[Gemini response parse error] finishReason:', finishReason, '| rawText:', rawText);
       return res.status(502).json({ error: 'could not parse Gemini response as JSON' });
     }
 
