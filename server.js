@@ -69,7 +69,10 @@ ${JSON.stringify(facts)}
         body: JSON.stringify({
           system_instruction: { parts: [{ text: system_prompt || '' }] },
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: { temperature: 0.9, maxOutputTokens: 2048 },
+          generationConfig: {
+            temperature: 0.9,
+            maxOutputTokens: 8192, // 생각(thinking) 토큰까지 감안해 넉넉하게 설정
+          },
         }),
       }
     );
