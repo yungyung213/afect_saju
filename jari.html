@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>대기실 · A.FECT SAJU</title>
+<title>대기실 ㅣ A.FECT SAJU</title>
 <style>
   :root{
     --paper:#F6F2EA; --card:#FFFDF8; --ink:#221F1A; --ink-soft:#6B655B; --ink-faint:#A39C8E;
@@ -134,26 +134,26 @@
   .connector-group.pinned .connector-dot{ fill:var(--accent) !important; animation:none; r:8; }
   @keyframes dotpulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
 
-  .teambalance-below{ max-width:260px; margin:var(--sp32) auto 0; text-align:center; }
+  .teambalance-below{ max-width:260px; margin:0 auto var(--sp32); text-align:center; }
   .teambalance-below .tblabel{ font-size:10.5px; font-weight:700; color:var(--ink-soft); letter-spacing:0.04em; margin-bottom:var(--sp8); }
   .teambalance-below .tbar{ display:flex; height:8px; border-radius:999px; overflow:hidden; margin-bottom:7px; }
   .teambalance-below .tbar span{ height:100%; }
   .teambalance-below .tnote{ font-size:10.5px; color:var(--ink-soft); line-height:1.5; }
 
-  .pair-tooltip{ position:absolute; z-index:6; width:280px; background:var(--card); color:var(--ink);
-    border:1px solid var(--line); border-radius:16px; padding:22px 24px; display:none; text-align:left;
-    box-shadow:0 14px 32px rgba(34,31,26,0.16); pointer-events:auto; }
+  .pair-tooltip{ position:absolute; z-index:6; width:280px; background:#181614; color:#fff;
+    border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:22px 24px; display:none; text-align:left;
+    box-shadow:0 14px 32px rgba(0,0,0,0.35); pointer-events:auto; }
   @media (min-width:860px){ .pair-tooltip{ width:380px; padding:24px; } }
-  .pair-tooltip.pinned{ border-color:var(--accent); box-shadow:0 16px 36px rgba(34,31,26,0.22); }
-  .pair-tooltip .tt-pin-badge{ display:none; font-size:10.5px; font-weight:700; color:var(--accent); margin-bottom:var(--sp8); }
+  .pair-tooltip.pinned{ border-color:var(--accent); box-shadow:0 16px 36px rgba(0,0,0,0.45); }
+  .pair-tooltip .tt-pin-badge{ display:none; font-size:10.5px; font-weight:700; color:#B9AEE0; margin-bottom:var(--sp8); }
   .pair-tooltip.pinned .tt-pin-badge{ display:block; }
-  .pair-tooltip .tt-names{ font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:var(--sp8); }
-  .pair-tooltip .tt-headline{ font-size:17px; font-weight:700; line-height:1.5; margin-bottom:var(--sp12); }
-  .pair-tooltip .tt-summary{ font-size:14.5px; color:var(--ink-soft); line-height:1.7; margin-bottom:var(--sp8); }
-  .pair-tooltip .tt-toggle{ font-size:12px; font-weight:700; color:var(--accent); cursor:pointer; display:none; margin-bottom:var(--sp8); }
+  .pair-tooltip .tt-names{ font-size:12.5px; font-weight:700; color:rgba(255,255,255,0.55); margin-bottom:var(--sp8); }
+  .pair-tooltip .tt-headline{ font-size:17px; font-weight:700; line-height:1.5; margin-bottom:var(--sp12); color:#fff; }
+  .pair-tooltip .tt-summary{ font-size:14.5px; color:rgba(255,255,255,0.82); line-height:1.7; margin-bottom:var(--sp8); }
+  .pair-tooltip .tt-toggle{ font-size:12px; font-weight:700; color:#C7BCEE; cursor:pointer; display:none; margin-bottom:var(--sp8); }
   .pair-tooltip.pinned .tt-toggle{ display:inline-block; }
-  .pair-tooltip .tt-evidence{ display:none; font-size:13.5px; color:var(--ink-soft); line-height:1.7; border-top:1px solid var(--line); padding-top:var(--sp12); }
-  .pair-tooltip .tt-close{ position:absolute; top:10px; right:12px; background:none; border:none; color:var(--ink-faint); font-size:16px; cursor:pointer; display:none; }
+  .pair-tooltip .tt-evidence{ display:none; font-size:13.5px; color:rgba(255,255,255,0.62); line-height:1.7; border-top:1px solid rgba(255,255,255,0.14); padding-top:var(--sp12); }
+  .pair-tooltip .tt-close{ position:absolute; top:10px; right:12px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:16px; cursor:pointer; display:none; }
   .pair-tooltip.pinned .tt-close{ display:block; }
 
   .resultcard{ max-width:460px; margin:0 auto var(--sp24); background:var(--card); border:1px solid var(--line);
@@ -220,7 +220,7 @@
 
   <div class="pagehead">
     <h1>대기실</h1>
-    <p class="subcopy" id="lobbySubcopy">오늘도 다들 먼저 와 있습니다.</p>
+    <p class="subcopy" id="lobbySubcopy">자자 다들 들어오세요!</p>
   </div>
 
   <div class="typetabs" id="typeTabs"></div>
@@ -228,10 +228,10 @@
   <p class="typecaption" id="typeCaption"></p>
 
   <div class="lobbyStage" id="lobbyStage">
-    <div class="lobby-empty-msg" id="lobbyEmptyMsg">아직 아무도 없어요.<br>아래에서 첫 멤버로 참여해 보세요.</div>
+    <div class="lobby-empty-msg" id="lobbyEmptyMsg">아직 아무도 없어요.<br>첫 멤버로 참여해 보세요.</div>
   </div>
 
-  <div class="joinRow"><button class="joinBtnPill" id="joinBtn">+ 새 멤버 참여시키기</button></div>
+  <div class="joinRow"><button class="joinBtnPill" id="joinBtn">+ 참여하기</button></div>
 
   <div class="selectRow">
     <button class="selectBtn primary" id="selectAllBtn">전체 선택</button>
@@ -1048,6 +1048,16 @@ function renderSeatingResult(box, selMembers) {
       lbl.className = 'tablabel'; lbl.textContent = `테이블 ${tableIndex+1} (${order.length}명)`;
       card.appendChild(lbl);
     }
+    const teamCounts = { '목':0,'화':0,'토':0,'금':0,'수':0 };
+    order.forEach(m => { Object.keys(teamCounts).forEach(k => teamCounts[k] += m.counts[k]); });
+    const total = Object.values(teamCounts).reduce((a,b)=>a+b,0) || 1;
+    const sortedTeam = Object.entries(teamCounts).sort((a,b)=>b[1]-a[1]).filter(([k,v])=>v>0);
+    const balDiv = document.createElement('div');
+    balDiv.className = 'teambalance-below';
+    balDiv.innerHTML = `<div class="tblabel">TEAM BALANCE</div>
+      <div class="tbar">${Object.entries(teamCounts).map(([k,v])=>{ const pct=(v/total*100).toFixed(1); return v>0 ? `<span style="width:${pct}%;background:${ELEM_COLOR[k]}"></span>` : ''; }).join('')}</div>
+      <div class="tnote">${sortedTeam.map(([k,v])=>`${k} ${Math.round(v/total*100)}%`).join(' · ')}</div>`;
+    card.appendChild(balDiv);
     const grid = layoutToGrid(order, geo);
     const tablewrap = document.createElement('div');
     tablewrap.className = 'tablewrap';
@@ -1113,17 +1123,6 @@ function renderSeatingResult(box, selMembers) {
       tablewrap.appendChild(node);
     });
     card.appendChild(tablewrap);
-
-    const teamCounts = { '목':0,'화':0,'토':0,'금':0,'수':0 };
-    order.forEach(m => { Object.keys(teamCounts).forEach(k => teamCounts[k] += m.counts[k]); });
-    const total = Object.values(teamCounts).reduce((a,b)=>a+b,0) || 1;
-    const sortedTeam = Object.entries(teamCounts).sort((a,b)=>b[1]-a[1]).filter(([k,v])=>v>0);
-    const balDiv = document.createElement('div');
-    balDiv.className = 'teambalance-below';
-    balDiv.innerHTML = `<div class="tblabel">TEAM BALANCE</div>
-      <div class="tbar">${Object.entries(teamCounts).map(([k,v])=>{ const pct=(v/total*100).toFixed(1); return v>0 ? `<span style="width:${pct}%;background:${ELEM_COLOR[k]}"></span>` : ''; }).join('')}</div>
-      <div class="tnote">${sortedTeam.map(([k,v])=>`${k} ${Math.round(v/total*100)}%`).join(' · ')}</div>`;
-    card.appendChild(balDiv);
     grid2.appendChild(card);
   });
 }
@@ -1183,13 +1182,79 @@ function renderClashResult(box, list) {
 
   const head = document.createElement('div');
   head.className = 'resulthead';
-  head.innerHTML = `<h2>파국 조합</h2><p class="lede">선택한 멤버 중 사주상 마찰 요인이 가장 많은 콘텐츠용 조합입니다. "사이가 나쁘다"는 뜻은 아니에요.</p>`;
+  head.innerHTML = `<h2>파국 조합</h2><p class="lede">선택한 멤버 중, 실제 테이블에 앉혔을 때 사주상 마찰 요인이 가장 많은 콘텐츠용 옆자리입니다. "사이가 나쁘다"는 뜻은 아니에요.</p>`;
   box.appendChild(head);
+
+  // 파국 조합을 실제 좌석 배치도(2인석 테이블)로 시각화 — 연결선을 경고색으로 강조
+  const geo = getGeo();
+  const grid = layoutToGrid([a, b], geo);
+  const tablewrap = document.createElement('div');
+  tablewrap.className = 'tablewrap';
+  tablewrap.style.width = grid.boxWidth + 'px'; tablewrap.style.height = grid.boxHeight + 'px';
+  tablewrap.style.margin = '0 auto var(--sp32)';
+
+  const tableRect = document.createElement('div');
+  tableRect.className = 'table-rect';
+  tableRect.style.width = grid.tableWidth + 'px'; tableRect.style.height = grid.tableHeight + 'px'; tableRect.style.zIndex = '1';
+  tablewrap.appendChild(tableRect);
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', grid.boxWidth); svg.setAttribute('height', grid.boxHeight);
+  svg.setAttribute('viewBox', `0 0 ${grid.boxWidth} ${grid.boxHeight}`);
+  svg.style.position = 'absolute'; svg.style.left = '0'; svg.style.top = '0'; svg.style.zIndex = '2';
+  tablewrap.appendChild(svg);
+
+  const [connA, connB] = buildGridConnectors(grid.topPos, grid.bottomPos)[0];
+  const ep = edgePoints(connA, connB, geo.circleD/2, 10);
+  const path = `M ${ep.ax} ${ep.ay} L ${ep.bx} ${ep.by}`;
+  const g = document.createElementNS(svgNS, 'g'); g.classList.add('connector-group');
+  const visible = document.createElementNS(svgNS, 'path');
+  visible.setAttribute('d', path); visible.setAttribute('fill', 'none'); visible.setAttribute('stroke', 'var(--fire)'); visible.setAttribute('stroke-width', '3');
+  visible.classList.add('connector-visible'); g.appendChild(visible);
+  const mid = { x:(ep.ax+ep.bx)/2, y:(ep.ay+ep.by)/2 };
+  const dot = document.createElementNS(svgNS, 'circle');
+  dot.setAttribute('cx', mid.x); dot.setAttribute('cy', mid.y); dot.setAttribute('r', 7); dot.setAttribute('fill', 'var(--fire)');
+  dot.classList.add('connector-dot'); dot.style.pointerEvents = 'all';
+  g.appendChild(dot);
+  const hit = document.createElementNS(svgNS, 'path');
+  hit.setAttribute('d', path); hit.setAttribute('fill', 'none'); hit.setAttribute('stroke', 'transparent'); hit.setAttribute('stroke-width', '26');
+  hit.classList.add('connector-hit'); g.appendChild(hit);
+  svg.appendChild(g);
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'pair-tooltip';
+  tooltip.innerHTML = `<button class="tt-close">×</button><div class="tt-pin-badge">📌 고정됨</div>
+    <div class="tt-names">💥 파국 조합</div><div class="tt-headline">${ctx.headline}</div><div class="tt-summary">${ctx.summary}</div>
+    <div class="tt-toggle">명리로 보면 왜?</div><div class="tt-evidence">${ctx.detail}</div>`;
+  tablewrap.appendChild(tooltip);
+  tooltip.addEventListener('click', e=> e.stopPropagation());
+  tooltip.querySelector('.tt-close').addEventListener('click', ()=> unpinTooltip(tooltip));
+  tooltip.querySelector('.tt-toggle').addEventListener('click', function(){
+    const ev = tooltip.querySelector('.tt-evidence');
+    const open = ev.style.display === 'block';
+    ev.style.display = open ? 'none' : 'block';
+    this.textContent = open ? '명리로 보면 왜?' : '접기';
+  });
+  attachPairTooltip(g, tooltip, tablewrap, dot, seatingMode, a, b);
+
+  [...grid.topPos, ...grid.bottomPos].forEach(seat=>{
+    const mem = seat.mem;
+    const stemIdx = mem.saju.day.stemIdx, elem = STEM_ELEM[stemIdx], branchIdx = mem.saju.day.branchIdx;
+    const node = document.createElement('div');
+    node.className = 'seat-node';
+    node.style.left = (seat.x - geo.circleD/2) + 'px'; node.style.top = (seat.y - geo.circleD/2) + 'px';
+    node.innerHTML = `<div class="circle" style="background:${ELEM_BG[elem]}; width:${geo.circleD}px; height:${geo.circleD}px; font-size:42px;">${ZODIAC_EMOJI[branchIdx]}</div>
+      <div class="label" style="font-size:15.5px; max-width:120px;">${mem.displayName}</div>
+      <div class="typecap" style="font-size:13px;">${stemHanjaHangul(stemIdx)}</div>`;
+    tablewrap.appendChild(node);
+  });
+  box.appendChild(tablewrap);
 
   const clashHead = document.createElement('div');
   clashHead.className = 'clashhead';
   clashHead.innerHTML = `<div class="chip"><span class="em">${ZODIAC_EMOJI[a.saju.day.branchIdx]}</span>${a.displayName}</div>
-    <span style="color:var(--ink-faint); font-weight:700;">×</span>
+    <span style="color:var(--fire); font-weight:700;">💥</span>
     <div class="chip"><span class="em">${ZODIAC_EMOJI[b.saju.day.branchIdx]}</span>${b.displayName}</div>`;
   box.appendChild(clashHead);
 
