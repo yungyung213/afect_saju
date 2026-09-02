@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 });
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-2.0-flash'; // 필요에 따라 다른 Gemini 모델로 교체 가능
+const GEMINI_MODEL = 'gemini-3.6-flash'; // Google 안내에 따라 gemini-2.0-flash에서 교체 (2026-09 기준)
 
 if (!GEMINI_API_KEY) {
   console.warn('[WARN] GEMINI_API_KEY 환경변수가 설정되지 않았습니다. 모든 요청이 실패로 처리됩니다.');
