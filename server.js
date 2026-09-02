@@ -69,7 +69,7 @@ ${JSON.stringify(facts)}
         body: JSON.stringify({
           system_instruction: { parts: [{ text: system_prompt || '' }] },
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: { temperature: 0.9, maxOutputTokens: 500 },
+          generationConfig: { temperature: 0.9, maxOutputTokens: 800 },
         }),
       }
     );
@@ -82,7 +82,9 @@ ${JSON.stringify(facts)}
 
     const geminiData = await geminiRes.json();
     const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const cleaned = rawText.replace(/```json|```/g, '').trim();
+    // Gemini가 JSON 앞뒤로 설명 문구를 덧붙이는 경우가 있어, 첫 '{'부터 마지막 '}'까지만 추출한다.
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    const cleaned = (jsonMatch ? jsonMatch[0] : rawText.replace(/```json|```/g, '')).trim();
 
     let parsed;
     try {
