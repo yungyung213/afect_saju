@@ -719,7 +719,7 @@ function buildPairContext(mode, memA, memB) { return mode === 'oksudong-elem' ? 
 // /api/saju-copy가 실제로는 존재하지 않으므로 항상 네트워크 실패 → 폴백으로 이어집니다.
 // 실제로 Gemini가 응답하게 하려면 같이 보내드린 server.js를 배포한 뒤, 아래 API_BASE를
 // 배포한 주소로 바꿔주세요. (프론트와 백엔드를 같은 도메인에서 서빙한다면 빈 문자열로 둬도 됩니다.)
-const API_BASE = ''; // 예: 'https://your-backend.onrender.com' (마지막에 슬래시 없이)
+const API_BASE = 'https://afect-saju.onrender.com'; // 예: 'https://your-backend.onrender.com' (마지막에 슬래시 없이)
 const AI_SYSTEM_PROMPT = `너는 사내에서 재미로 사용하는 사주 콘텐츠의 카피라이터다.
 목표는 명리 지식을 설명하는 것이 아니라 "사람들이 서로 결과를 눌러보며 웃게 만드는 것"이다.
 작성 규칙: 첫 문장은 무조건 관찰형 유머로, 회사 생활에서 볼 법한 상황을 적극 사용해 짧고 바로 이해되게 쓴다.
